@@ -1,0 +1,11 @@
+{{ define "main" -}}
+<div>
+  {{ .Content -}}
+</div>
+<ul>
+  {{ range (.Paginate ( where .Site.RegularPages "Type" "in" site.Params.mainSections )).Pages -}}
+  <li>{{ .Date.Format "2006-01-02 15:04" }} - <a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+  {{ end -}}
+</ul>
+{{ template "_internal/pagination.html" . -}}
+{{ end -}}

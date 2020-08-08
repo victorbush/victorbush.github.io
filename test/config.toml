@@ -1,0 +1,7 @@
+baseURL = "http://victorbush.github.io/"
+languageCode = "en-us"
+title = "victorbush"
+theme = "victorbush"
+
+[permalinks]
+  posts = "/:year/:month/:title/"
