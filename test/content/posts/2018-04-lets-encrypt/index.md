@@ -4,7 +4,7 @@ date: 2018-04-21T11:21:23-05:00
 draft: false
 ---
 
-# Overview
+## Overview
 
 Example repo [here](https://github.com/victorbush/examples.lendd).
 
@@ -21,8 +21,8 @@ This article describes the example in two sections:
 1. **How it works** - what software is used, how each piece interacts, etc.
 2. **How to use it** - how to configure the example and run the Docker container.
 
-# How it Works
-## Overview
+## How it Works
+### Overview
 
 ![](diagram.png)
 
@@ -43,7 +43,7 @@ Software used:
 - `dehydrated.hooks.sh` - a shell script used for callback hooks by Dehydrated.
 - [dns-lexicon](https://github.com/AnalogJ/lexicon) - a Python library for interacting with various DNS providers.
 
-## Let's Encrypt
+### Let's Encrypt
 Let's Encrypt provides free SSL certificates. It provides an API that is used to handle the certificate generation requests.
 
 Let's Encrypt requires domain ownership to be validated before issuing an SSL certificate. The basic `http-01` challenge requires a challenge value to be served over HTTP at the path `/.well-known/acme-validation/`. This is not always possible.
@@ -52,20 +52,20 @@ The `dns-01` challenge provides an alternative where DNS TXT records are updated
 
 The custom Docker image in this example automates this.
 
-## NGINX
+### NGINX
 NGINX is the primary component of the Docker image. The NGINX server is configured as needed (for example, as a reverse proxy). The configuration points to the generated SSL certificates.
 
-## Dehydrated
+### Dehydrated
 Let's Encrypt provides an API to handle creation/renewal of certificates. [Dehydrated](https://github.com/lukas2511/dehydrated) is a shell-script client that interacts with this API.
 
 When the Dehydrated script is called, it will:
 - check its configuration for a list of domains to get certificates for.
 - compare this list with any existing certificates.
-- If no certificates exist, it will try to create them.
-- If certificates exist, it will check if they need renewed.
-- If certificates need renewed, it will try to renew them.
+- if no certificates exist, it will try to create them.
+- if certificates exist, it will check if they need renewed.
+- if certificates need renewed, it will try to renew them.
 
-## Dehydrated Hooks Script
+### Dehydrated Hooks Script
 When Dehydrated interacts with the Let's Encrypt API, it executes callback hooks for different parts of the certificate creation process. For example, a hook function is called when:
 - a domain needs validated.
 - a domain failed validation.
@@ -75,12 +75,12 @@ When Dehydrated interacts with the Let's Encrypt API, it executes callback hooks
 
 The hooks script contains the callback functions and the instructions to perform when each one is called.
 
-## dns-lexicon
+### dns-lexicon
 During the domain validation process, a DNS TXT record must be updated with a specific challenge value that is provided by Let's Encrypt. dns-lexicon is a Python library that can interact with various DNS providers.
 
 The Dehydrated hooks script takes the DNS challenge value provided by Let's Encrypt and uses the dns-lexicon library to update the DNS record with the challenge. Let's Encrypt then verifies the DNS record was updated and the domain validation passes.
 
-## Cron
+### Cron
 A cron job is setup to handle automatic creation/renewal of certificates.
 
 Here is the crontab file being used:
@@ -91,7 +91,7 @@ Here is the crontab file being used:
 
 This calls the Dehydrated client once on reboot and once a week after that.
 
-## Put it all together
+### Put it all together
 Let's see how everything works together to create a certificate from Let's Encrypt.
 - The cron job executes the Dehydrated client script.
 - Dehydrated checks its configuration and determines a certificate has expired and needs renewed.
@@ -108,7 +108,7 @@ Let's see how everything works together to create a certificate from Let's Encry
 - Dehydrated calls the hooks script and indicates a new certificate was created.
 - The hooks script instructs NGINX to reload its configuration to start using the new certificate.
 
-# How to Use It
+## How to Use It
 Download the example repository [here](https://github.com/victorbush/examples.lendd).
 
 There are four steps to get things running:
@@ -117,7 +117,7 @@ There are four steps to get things running:
 3. Build the Docker Image
 4. Run the Container
 
-## 1. Configure Dehydrated
+### 1. Configure Dehydrated
 This example has a specific Dehydrated configuration. The [official Dehydrated docs](https://github.com/lukas2511/dehydrated/tree/master/docs) are available for alternate configurations.
 
 There are three configuration files to be aware of:
@@ -128,26 +128,26 @@ There are three configuration files to be aware of:
 | `/etc/dehydrated/dehydrated.hooks.sh` | Script that is called for different stages of the certificate creation/renewal process. |
 | `/etc/dehydrated/domains.txt` | List of domains to create certificates for. |
 
-### Main Dehydrated config
+#### Main Dehydrated config
 The main config file mostly uses the default values, except for the following:
 
 ```
-# Use the dns-01 challenge
+## Use the dns-01 challenge
 CHALLENGETYPE="dns-01"
 
-# Location of the domains.txt file
+## Location of the domains.txt file
 DOMAINS_TXT="/etc/dehydrated/domains.txt"
 
-# Location of the hooks script
+## Location of the hooks script
 HOOK=/etc/dehydrated/dehydrated.hooks.sh
 
-# Contact email address (to get renewal notifications from Let's Encrypt)
+## Contact email address (to get renewal notifications from Let's Encrypt)
 CONTACT_EMAIL=you@example.com
 ```
 
 Make sure to update the email address in `CONTACT_EMAIL`.
 
-### Hooks script
+#### Hooks script
 The `dehydrated.hooks.sh` script handles the Dehydrated hooks. It is based off [this example](https://github.com/AnalogJ/lexicon/blob/master/examples/dehydrated.default.sh).
 
 The only change was to restart NGINX when new certificates are created (required so NGINX reloads the new certificates).
@@ -158,12 +158,12 @@ function deploy_cert {
 
     echo "deploy_cert called: ${DOMAIN}, ${KEYFILE}, ${CERTFILE}, ${FULLCHAINFILE}, ${CHAINFILE}"
 
-    # Restart nginx so new certificates are reloaded
+    ## Restart nginx so new certificates are reloaded
     nginx -s reload
 }
 ```
 
-### Domain definition
+#### Domain definition
 The `domains.txt` file lists the certificates you want to create and the domains associated with each certificate. For example, the following will create a single certificate with three domains:
 
 ```
@@ -176,7 +176,7 @@ More details [here](https://github.com/lukas2511/dehydrated/blob/master/docs/dom
 
 *Update*: Let's Encrypt now supports [wilcard certificates](https://community.letsencrypt.org/t/acme-v2-and-wildcard-certificate-support-is-live/55579).
 
-## 2. Configure NGINX
+### 2. Configure NGINX
 Generated certificates and keys are stored in `/etc/dehydrated/certs/<cert-name>/`. NGINX can be pointed directly to the certificates.
 
 NGINX configuration is beyond the scope of this article, but here is a quick example:
@@ -198,7 +198,7 @@ server {
 
 Put this in `/etc/nginx/conf.d/example.conf`.
 
-## 3. Build the Docker Image
+### 3. Build the Docker Image
 The Dockerfile (`src/Dockerfile`) is hopefully self-explanatory. There is a startup script (`src/startup.sh`) that is executed when the Docker container boots up.
 
 To build the image, execute the following while in the `src` directory:
@@ -209,8 +209,8 @@ docker build -t nginx-dehydrated .
 
 This will tag the image as `nginx-dehydrated`. This can be changed as desired.
 
-## 4. Run the Docker Container
-### Mounts
+### 4. Run the Docker Container
+#### Mounts
 Mount these directories on the host file system or in a Docker volume.
 
 | Directory      | Description  |
@@ -218,7 +218,7 @@ Mount these directories on the host file system or in a Docker volume.
 | `/etc/dehydrated` | Contains configuration files for the Dehydrated client. Generated files (certificates, account data, etc.) are stored here as well. |
 | `/etc/nginx/conf.d` | Additional NGINX configuration files (if needed). |
 
-### Environment Variables
+#### Environment Variables
 The DNS provider and credentials used by dns-lexicon are specified using environment variables. If you are not using Cloudflare, then substitute the appropriate variables for your DNS provider (see [here](https://github.com/AnalogJ/lexicon#environmental-variables)).
 
 | Name           | Description  |
@@ -227,7 +227,7 @@ The DNS provider and credentials used by dns-lexicon are specified using environ
 | `LEXICON_CLOUDFLARE_USERNAME` | Cloudflare username |
 | `LEXICON_CLOUDFLARE_TOKEN` | Cloudflare API key |
 
-### Example
+#### Example
 After building the Docker image, you can run a container with the image.
 
 ```
@@ -259,11 +259,11 @@ You can monitor the status of the Dehydrated client using:
 docker exec -it revprox tail -f /var/log/cron
 ```
 
-# Notes
-## Dehydrated env
+## Notes
+### Dehydrated env
 Dehydrated seems to require the `env` command to be used to set the environment. If this is not set, you may see an error like this:
 ```
-# INFO: Using main config file /etc/dehydrated/config
+## INFO: Using main config file /etc/dehydrated/config
 ERROR: Lock file '/etc/dehydrated/lock' present, aborting.
 ```
 
@@ -276,7 +276,7 @@ This also must be done in <code>crontab</code>. See <code>src/crontab</code> for
 
 See also: [https://unix.stackexchange.com/questions/103467/what-is-env-command-doing](https://unix.stackexchange.com/questions/103467/what-is-env-command-doing)
 
-# References
+## References
 - [How to run NGINX with daemon off](https://github.com/nginxinc/docker-nginx/issues/41)
 - [Official Dehydrated docs](https://github.com/lukas2511/dehydrated/tree/master/docs)
 - [Good example of using Dehydrated](https://blog.thesparktree.com/generating-intranet-and-private-network-ssl)
