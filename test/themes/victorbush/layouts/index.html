@@ -2,9 +2,13 @@
 <div>
   {{ .Content -}}
 </div>
+<div class="title">
+  <h1>victorbush</h1>
+</div>
+<h2>Articles</h2> 
 <ul>
   {{ range (.Paginate ( where .Site.RegularPages "Type" "in" site.Params.mainSections )).Pages -}}
-  <li>{{ .Date.Format "2006-01-02 15:04" }} - <a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+  <li>{{ .Date.Format "2006-01-02" }} - <a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
   {{ end -}}
 </ul>
 {{ template "_internal/pagination.html" . -}}
