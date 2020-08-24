@@ -23,5 +23,15 @@ The following requirements are imposed:
  use NGINX running in a Docker container. automatically generate and renew SSL certificates. automatically update NGINX configuration to use the new certificate. use Let&amp;rsquo;s Encrypt as the certificate authority (CA). use Cloudflare as the DNS provider.  This article describes the example in two sections:</description>
     </item>
     
+    <item>
+      <title>NeFS Edit</title>
+      <link>http://victorbush.github.io/2018/04/nefs-edit/</link>
+      <pubDate>Sat, 07 Apr 2018 10:21:23 -0500</pubDate>
+      
+      <guid>http://victorbush.github.io/2018/04/nefs-edit/</guid>
+      <description>Overview The NeFS archive file format has been partially reversed engineered. The NeFS format is used in various games developed by Codemasters (such as DiRT 4) using their proprietary EGO game engine.
+The NeFS Edit tool was created to extract files from and modify these archive files. The tool has limitations and has issues with certain archives. Read the readme for more information. Binaries and source code provided as-is with no support.</description>
+    </item>
+    
   </channel>
 </rss>
