@@ -3,9 +3,9 @@
   {{ .Content -}}
 </div>
 <div class="title">
-  <h1>victorbush</h1>
+  <h1>Articles</h1>
 </div>
-<h2>Articles</h2> 
+
 <ul>
   {{ range (.Paginate ( where .Site.RegularPages "Type" "in" site.Params.mainSections )).Pages -}}
   <li>{{ .Date.Format "2006-01-02" }} - <a href="{{ .RelPermalink }}">{{ .Title }}</a></li>

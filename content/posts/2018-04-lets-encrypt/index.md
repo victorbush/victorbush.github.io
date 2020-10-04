@@ -4,8 +4,6 @@ date: 2018-04-21T11:21:23-05:00
 draft: false
 ---
 
-## Overview
-
 Example repo [here](https://github.com/victorbush/examples.lendd).
 
 The goal of this example is to get a free SSL certificate from a legitimate Certificate Authority that automatically renews itself.

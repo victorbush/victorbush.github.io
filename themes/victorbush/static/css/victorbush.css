@@ -21,18 +21,17 @@ a:visited {
 	color: #4d57a4;
 }
 
-h1 {
+h1, h2 {
 	font-family: 'Libre Baskerville', serif;
-	margin: 0;
 	color: #3d3d3d;
-	font-size: 2.3rem;
+	border-bottom: 0.3rem solid #447ec1;
+	padding-bottom: 0.7rem;
+	margin: 1rem 0 2rem 0;
+	font-size: 1.4rem;
 }
 
 h2 {
-	color: #3d3d3d;
-	border-bottom: 0.1rem dashed #3d3d3d;
-	padding-bottom: 0.7rem;
-	margin: 3rem 0 1rem 0;
+	margin: 3rem -1rem 2rem -1rem;
 }
 
 h3, h4, h5 {
@@ -61,15 +60,11 @@ tbody tr:first-child td {
 }
 
 th {
-	color: #fff;
+	text-decoration: underline;
 }
 
 td, th {
 	padding: 0.4rem 0.9rem;
-}
-
-thead tr {
-	background-color: #9babbe;
 }
 
 /*
@@ -77,14 +72,18 @@ Header
 */
 
 .site-header {
-	border-top: solid .75rem #447ec1;
+	border-top: solid .5rem #447ec1;
 	text-align: center;
 	padding: 1rem;
 }
 
 .site-header img {
-	max-width: 4rem;
+	max-width: 8rem;
 	max-height: none;
+}
+
+nav {
+	text-align: center;
 }
 
 /*
@@ -103,13 +102,18 @@ article {
 }
 
 .title {
-	text-align: center;
-	margin: 1rem;
+	text-align: left;
+	margin: 1rem 0;
 }
 
 .meta {
-	text-align: center;
+	text-align: left;
 	font-size: 0.7rem;
+	font-style: italic;
+}
+
+.content {
+	padding: 0 1rem 2rem 1rem;
 }
 
 /*
