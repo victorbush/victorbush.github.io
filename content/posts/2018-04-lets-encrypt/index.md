@@ -2,6 +2,7 @@
 title: "Let's Encrypt"
 date: 2018-04-21T11:21:23-05:00
 draft: false
+cover: "feature.jpg"
 ---
 
 Example repo [here](https://github.com/victorbush/examples.lendd).

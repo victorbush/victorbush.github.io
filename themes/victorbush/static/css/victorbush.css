@@ -107,6 +107,7 @@ article {
 	background-position: center;
 	margin: 0 auto 2rem auto;
 	max-width: 96rem;
+	outline: #447ec1 1px solid;
 }
 @media (max-width: 550px) {
 	.cover {
