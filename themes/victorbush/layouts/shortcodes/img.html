@@ -1,0 +1,21 @@
+<div class="img-container">
+	{{ with .Get "link" }}
+	<a href="{{.}}">
+	{{ end }}
+
+	<img src="{{ .Get "src" }}" 
+
+	{{ with .Get "width" }}
+	width={{.}}
+	{{ end }}
+	
+	/>
+
+	{{ if .Get "link" }}
+	</a>
+	{{ end }}
+	
+	{{ with .Get "caption" }}
+	<div class="img-caption">{{.}}</div>
+	{{ end }}
+</div>

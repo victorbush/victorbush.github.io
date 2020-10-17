@@ -1,0 +1,21 @@
+<div class="list-img-list">
+	{{ with .Get "link" }}
+	<a href="{{.}}">
+	{{ end }}
+
+	<img class="list-img" src="{{ .Get "src" }}" 
+
+	{{ with .Get "width" }}
+	width={{.}}
+	{{ end }}
+	
+	/>
+
+	{{ if .Get "link" }}
+	</a>
+	{{ end }}
+	
+	{{ with .Get "caption" }}
+	<div class="list-img-caption">{{.}}</div>
+	{{ end }}
+</div>

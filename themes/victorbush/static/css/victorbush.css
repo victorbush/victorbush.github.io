@@ -5,7 +5,7 @@ body {
 }
 
 p {
-	line-height: 1.3rem;
+	line-height: 1.5rem;
 }
 
 a {
@@ -138,4 +138,38 @@ pre code {
 	margin-bottom: 2rem;
 	overflow-x: auto;
 	color: #000;
+}
+
+/*
+Image
+*/
+
+.img-container {
+	margin: 2rem 0;
+}
+
+.img-caption {
+	font-size: 0.8rem;
+	color: #888;
+	margin-top: 0.2rem;
+}
+
+/*
+List-img
+*/
+
+.list-img-list {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.list-img {
+	margin-right: 1rem;
+	max-width: 20rem;
+}
+
+.list-img-caption {
+	font-size: 0.8rem;
+	color: #888;
 }

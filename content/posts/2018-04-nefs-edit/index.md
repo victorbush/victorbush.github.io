@@ -4,8 +4,6 @@ date: 2018-04-07T10:21:23-05:00
 draft: false
 ---
 
-## Overview
-
 The NeFS archive file format has been partially reversed engineered. The NeFS format is used in various games developed by Codemasters (such as [DiRT 4](https://www.dirt4game.com/)) using their proprietary [EGO game engine](https://en.wikipedia.org/wiki/EGO_(game_engine)).
 
 The NeFS Edit tool was created to extract files from and modify these archive files. The tool has limitations and has issues with certain archives. Read the readme for more information. Binaries and source code provided as-is with no support.
