@@ -2,6 +2,7 @@
 title: "The Anti-Rootkit Rootkit"
 date: 2015-04-21T11:21:23-05:00
 draft: false
+cover: "cover.jpg"
 ---
 
 I was recently analyzing a piece of malware that used a user-mode rootkit to hide itself in the process list. This makes the malware difficult to actively debug. I wondered if I could change the tides by using my own simple rootkit to UN-hide the malware. Turns out it’s possible.

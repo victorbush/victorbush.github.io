@@ -2,6 +2,7 @@
 title: "Arduino RFID Door Strike"
 date: 2015-01-15T10:21:23-05:00
 draft: false
+cover: "cover.jpg"
 ---
 
 I rediscovered a shelved project over Christmas break, something I had never gotten around to doing. It's always nice to find an excuse to break out the soldering iron.

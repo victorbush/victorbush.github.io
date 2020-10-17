@@ -1,4 +1,10 @@
 {{ define "main" -}}
+
+{{ if .Params.cover }}
+<div class="cover" style="background-image: url({{ .Params.cover }})">
+</div>
+{{ end -}}
+
 <div class="meta">
   {{ if .Date -}}
   <div>{{ .Date.Format "January 01, 2006" }}</div>

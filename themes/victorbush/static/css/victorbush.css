@@ -96,9 +96,22 @@ main {
 
 article {
 	margin: 0 auto;
-	max-width: 900px;
-    padding: 0 1.5rem;
+	max-width: 850px;
+	padding: 0 1.5rem;
 	text-align: left;
+}
+
+.cover {
+	height: 200px;
+	background-size: cover;
+	background-position: center;
+	margin: 0 auto 2rem auto;
+	max-width: 96rem;
+}
+@media (max-width: 550px) {
+	.cover {
+		height: 100px;
+	}
 }
 
 .title {
@@ -158,10 +171,18 @@ Image
 List-img
 */
 
-.list-img-list {
+.list-img-container {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
+	margin: 1rem 0;
+}
+@media (max-width: 700px) {
+	.list-img-container {
+		flex-direction: column;
+		align-items: start;
+		margin: 1rem 0;
+	}
 }
 
 .list-img {

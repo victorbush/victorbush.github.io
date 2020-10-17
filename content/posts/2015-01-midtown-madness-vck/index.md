@@ -2,9 +2,8 @@
 title: "Midtown Madness"
 date: 2015-01-10T10:21:23-05:00
 draft: false
+cover: "midtown-madness.jpg"
 ---
-
-{{< img src="midtown-madness.jpg" >}}
 
 Ah, the nostalgia. Midtown Madness is one of my all-time favorite video games. If you are not familiar with said product, [read up on it](http://en.wikipedia.org/wiki/Midtown_Madness).
 
