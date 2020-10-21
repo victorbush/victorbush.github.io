@@ -13,6 +13,16 @@
 {{ with .Site.Params.favicon -}}
 <link rel="icon" href="{{ . }}" type="image/x-icon">
 {{ end -}}
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGMKKNJ3RD"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-HGMKKNJ3RD');
+  </script>
 </head>
 <body>
 <header>
