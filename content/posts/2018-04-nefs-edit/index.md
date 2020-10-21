@@ -1,6 +1,7 @@
 ---
 title: "NeFS Edit"
 date: 2018-04-07T10:21:23-05:00
+url: "/2018/04/nefs-edit"
 draft: false
 cover: "feature.jpg"
 ---

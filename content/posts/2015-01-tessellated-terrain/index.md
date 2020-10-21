@@ -1,6 +1,7 @@
 ---
 title: "Tessellated Terrain Rendering with Dynamic LOD"
 date: 2015-01-17T10:21:23-05:00
+url: "/2015/01/tessellated-terrain"
 draft: false
 cover: "cover.jpg"
 ---

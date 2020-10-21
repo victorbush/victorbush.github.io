@@ -13,10 +13,10 @@
     
     <item>
       <title>Let&#39;s Encrypt</title>
-      <link>http://victorbush.github.io/2018/04/lets-encrypt/</link>
+      <link>http://victorbush.github.io/2018/04/lets-encrypt-nginx-dns-docker/</link>
       <pubDate>Sat, 21 Apr 2018 11:21:23 -0500</pubDate>
       
-      <guid>http://victorbush.github.io/2018/04/lets-encrypt/</guid>
+      <guid>http://victorbush.github.io/2018/04/lets-encrypt-nginx-dns-docker/</guid>
       <description>Example repo here.
 The goal of this example is to get a free SSL certificate from a legitimate Certificate Authority that automatically renews itself.
 The following requirements are imposed:
@@ -46,10 +46,10 @@ Brief All analysis is performed in an isolated virtual machine for safety. This 
     
     <item>
       <title>Tessellated Terrain Rendering with Dynamic LOD</title>
-      <link>http://victorbush.github.io/2015/01/tessellated-terrain-rendering-with-dynamic-lod/</link>
+      <link>http://victorbush.github.io/2015/01/tessellated-terrain/</link>
       <pubDate>Sat, 17 Jan 2015 10:21:23 -0500</pubDate>
       
-      <guid>http://victorbush.github.io/2015/01/tessellated-terrain-rendering-with-dynamic-lod/</guid>
+      <guid>http://victorbush.github.io/2015/01/tessellated-terrain/</guid>
       <description>This report was for a project/presentation assignment for my Computer Graphics course in the Fall 2014 semester. The source code is available on BitBucket. Enjoy!
 Goals and Motivation Rendering large, detailed terrain meshes is an important issue in many graphics applications such as video games, simulators (flight, space, auto, world, etc.), and geographic information systems. The goal, as with many real-time rendering applications, is to render a high level of detail (LOD) without sacrificing efficiency and performance.</description>
     </item>
@@ -67,10 +67,10 @@ Arduinos are micro-controller boards that ease some of the complexity of develo
     
     <item>
       <title>Midtown Madness</title>
-      <link>http://victorbush.github.io/2015/01/midtown-madness/</link>
+      <link>http://victorbush.github.io/2015/01/midtown-madness-vck/</link>
       <pubDate>Sat, 10 Jan 2015 10:21:23 -0500</pubDate>
       
-      <guid>http://victorbush.github.io/2015/01/midtown-madness/</guid>
+      <guid>http://victorbush.github.io/2015/01/midtown-madness-vck/</guid>
       <description>Ah, the nostalgia. Midtown Madness is one of my all-time favorite video games. If you are not familiar with said product, read up on it.
 It is a worthy topic for a first entry. I could reminisce for paragraphs, but I&amp;rsquo;ll spare you. This post is archival in nature for two items: the VCK toolset and the Mercedes CLK.
 VCK Toolset The developers of Midtown Madness released a &amp;ldquo;Vehicle Creation Kit&amp;rdquo; (VCK) to allow users to create custom cars for use in game.</description>

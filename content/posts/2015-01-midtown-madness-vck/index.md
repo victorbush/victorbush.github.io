@@ -1,6 +1,7 @@
 ---
 title: "Midtown Madness"
 date: 2015-01-10T10:21:23-05:00
+url: "/2015/01/midtown-madness-vck"
 draft: false
 cover: "midtown-madness.jpg"
 ---

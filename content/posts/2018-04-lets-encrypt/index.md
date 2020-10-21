@@ -1,6 +1,7 @@
 ---
 title: "Let's Encrypt"
 date: 2018-04-21T11:21:23-05:00
+url: "/2018/04/lets-encrypt-nginx-dns-docker"
 draft: false
 cover: "feature.jpg"
 ---

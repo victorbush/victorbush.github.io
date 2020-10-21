@@ -1,6 +1,7 @@
 ---
 title: "Arduino RFID Door Strike"
 date: 2015-01-15T10:21:23-05:00
+url: "/2015/01/arduino-rfid-door-strike"
 draft: false
 cover: "cover.jpg"
 ---

@@ -1,6 +1,7 @@
 ---
 title: "The Anti-Rootkit Rootkit"
 date: 2015-04-21T11:21:23-05:00
+url: "/2015/04/the-anti-rootkit-rootkit"
 draft: false
 cover: "cover.jpg"
 ---
