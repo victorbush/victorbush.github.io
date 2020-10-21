@@ -15,22 +15,24 @@
   <div class="site-header">
     <a href="http://victorbush.github.io/">
       <img src="/img/victorbush-icon.png" alt="victorbush" />
-    </a>
+    </a>  
   </div>
 
   <nav></nav>
 </header>
 <main>
   <article>
-    <div class="title">
+    
+<div class="cover" style="background-image: url(feature.jpg)">
+</div>
+<div class="meta">
+  <div>April 21, 2018</div>
+  </div>
+<div class="title">
   <h1>Let&#39;s Encrypt</h1>
   </div>
-<div class="meta">
-  <div>2018-04-21</div>
-  </div>
 <div class="content">
-  <h2 id="overview">Overview</h2>
-<p>Example repo <a href="https://github.com/victorbush/examples.lendd">here</a>.</p>
+  <p>Example repo <a href="https://github.com/victorbush/examples.lendd">here</a>.</p>
 <p>The goal of this example is to get a free SSL certificate from a legitimate Certificate Authority that automatically renews itself.</p>
 <p>The following requirements are imposed:</p>
 <ul>
@@ -46,7 +48,7 @@
 <li><strong>How to use it</strong> - how to configure the example and run the Docker container.</li>
 </ol>
 <h2 id="how-it-works">How it Works</h2>
-<h3 id="overview-1">Overview</h3>
+<h3 id="overview">Overview</h3>
 <p><img src="diagram.png" alt=""></p>
 <p>A custom Docker image is created to satisfy the requirements. It is based off the <a href="https://hub.docker.com/_/nginx/">official NGINX Docker image</a>.</p>
 <p>The custom image does two things:</p>

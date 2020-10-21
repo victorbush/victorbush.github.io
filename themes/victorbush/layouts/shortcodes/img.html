@@ -1,4 +1,9 @@
+{{ with .Get "class" }}
+<div class="{{.}}">
+{{ else }}
 <div class="img-container">
+{{ end }}
+
 	{{ with .Get "link" }}
 	<a href="{{.}}">
 	{{ end }}

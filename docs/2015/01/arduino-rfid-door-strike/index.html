@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arduino RFID Door Strike - victorbush</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Staatliches&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Antic+Slab&display=swap" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="/css/normalize.css">
+<link rel="stylesheet" type="text/css" href="/css/victorbush.css">
+</head>
+<body>
+<header>
+  <div class="site-header">
+    <a href="http://victorbush.github.io/">
+      <img src="/img/victorbush-icon.png" alt="victorbush" />
+    </a>  
+  </div>
+
+  <nav></nav>
+</header>
+<main>
+  <article>
+    
+<div class="cover" style="background-image: url(cover.jpg)">
+</div>
+<div class="meta">
+  <div>January 15, 2015</div>
+  </div>
+<div class="title">
+  <h1>Arduino RFID Door Strike</h1>
+  </div>
+<div class="content">
+  <p>I rediscovered a shelved project over Christmas break, something I had never gotten around to doing. It&rsquo;s always nice to find an excuse to break out the soldering iron.</p>
+<p>The goal was to use an Arduino and an RFID reader to operate an electric door strike, granting or denying access to some door.</p>
+<p>Arduinos are micro-controller boards that ease some of the complexity of developing electronics projects. They are great fun to play with and the possibilities they present are virtually endless. If you have never played with an Arduino, check out this <a href="https://www.youtube.com/watch?v=fCxzA9_kg6s">series of tutorials</a> by Jeremy Blum. These are very helpful videos, not only for getting up to speed with Arduinos, but also for learning about electrical engineering and circuits. I found these videos a few years back when I first bought the Arduino. I&rsquo;m not an electrical engineer, so these videos helped me a lot.</p>
+<p>I&rsquo;ll walk through what I did for the RFID door strike project and explain what I can along the way. Perhaps it will be of help to someone attempting a similar project.</p>
+<h2 id="components-used">Components Used</h2>
+<ul>
+<li><a href="http://arduino.cc/en/Main/ArduinoBoardUno">Arduino Uno</a></li>
+<li><a href="http://www.sdcsecurity.com/25-Series-Electric-Strike.htm">SDC 25-4U Electric Door Strike</a></li>
+<li><a href="https://www.sparkfun.com/products/11828">ID-20 RFID Reader</a></li>
+<li><a href="https://www.sparkfun.com/products/13030">RFID Breakout Board</a></li>
+<li><a href="https://www.sparkfun.com/products/8310">RFID Card</a></li>
+<li><a href="https://www.sparkfun.com/products/9264">RGB LED</a></li>
+<li>Capacitors
+<ul>
+<li>1 x 10 uF</li>
+<li>1 x 100 uF</li>
+</ul>
+</li>
+<li>Resistors
+<ul>
+<li>3 x 100 ohms</li>
+<li>x 150 ohms</li>
+<li>1 x 1K ohms</li>
+</ul>
+</li>
+<li>TIP3055 Transistor</li>
+<li>7805 5VDC Voltage Regulator</li>
+<li>Coaxial Power Jack (Size N)</li>
+<li>12VDC power supply</li>
+<li>Project box or enclosure for main components</li>
+<li>Project box or enclosure for RFID reader module</li>
+<li>Ethernet cable, RJ-45 jacks or couplers<!-- raw HTML omitted --></li>
+<li>Wire, 22 AWG works well<!-- raw HTML omitted --></li>
+<li>A <a href="https://www.sparkfun.com/products/12002">breadboard</a> or two and some perfboard</li>
+</ul>
+<p>Your components list may differ, depending on what your goals are or simply what you have available. You don&rsquo;t need to use an Arduino Uno, or an Arduino at all, and other design decisions will be made per designer preference or other constraints.</p>
+<h2 id="the-id-20">The ID-20</h2>
+<p>First step is to make sure the RFID reader is functioning and that the Arduino can communicate with it. I highly recommend using the <a href="https://www.sparkfun.com/products/13030">RFID breakout board</a> as it makes prototyping with the reader immensely easier. Using some <a href="https://www.sparkfun.com/products/116">header pins</a> to attach to the breakout board allows you to pop the ID-20 into and out of breadboards with ease.</p>
+
+<div class="img-container">
+
+
+	
+	<a href="id20-a.jpg">
+	
+
+	<img src="id20-a.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">ID-20 RFID Reader</div>
+	
+</div>
+
+
+<div class="img-container">
+
+
+	
+	<a href="id20-b.jpg">
+	
+
+	<img src="id20-b.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">ID-20 bottom view with breakout board attached</div>
+	
+</div>
+
+<p>The version of the breakout board I used says &ldquo;ID12&rdquo; on it, but it still works with the ID-20. The pins on the bottom of the ID-20 are arranged in such a way that it is impossible to put the breakout board on incorrectly, but it is always a good idea to double check the pinouts and verify everything is correct. Also, it helps to solder the header pins into place <em>before</em> soldering the board to the ID-20 itself.</p>
+<p>The datasheet for the ID-20 can be found <a href="http://dlnmh9ip6v2uc.cloudfront.net/datasheets/Sensors/ID/ID-2LA,%20ID-12LA,%20ID-20LA2013-4-10.pdf">here</a>.</p>
+<p>It&rsquo;s a good idea to read section 6, &ldquo;Pin Description &amp; Output Data Formats&rdquo; in the datasheet, but I&rsquo;ll highlight some points.</p>
+<ul>
+<li>Pin 1 is ground.</li>
+<li>Pin 2 is strapped to Pin 11.</li>
+<li>Pin 7 is used to specify what data format the ID-20 sends back to the controller.
+<ul>
+<li>The ID-20 can transmit data back in ASCII, magnetic emulation, or Wiegan26.</li>
+<li>ASCII is simple and easy, so that&rsquo;s what I went with.</li>
+<li>Strap Pin 7 to ground for ASCII.</li>
+</ul>
+</li>
+<li>Pin 9 is used for data output when the ASCII format is selected.</li>
+<li>Pin 10 provides LED/Beeper functionality for when a card is read.</li>
+<li>Pin 11 is DC power.</li>
+</ul>
+<p>You can setup a simple test circuit with the ID-20 and Arduino to test the reader out.</p>
+
+<div class="img-container">
+
+
+	
+	<a href="ID-20-Test-Circuit.png">
+	
+
+	<img src="ID-20-Test-Circuit.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">ID-20 Test Circuit</div>
+	
+</div>
+
+<p>You can use whatever resistor value for (R8) you need for the LED (L6) you are using. The power for the reader is supplied from the Arduino. Note that we connect the LED to pin 10 on the ID-20. When any card is read by the reader, the LED will be lit momentarily.</p>
+<p>We can use an Arduino program (called a sketch) to read data that the RFID reader sends back when it reads a card.</p>
+<pre><code>/*
+* Code adapated from: http://playground.arduino.cc/Code/ID12
+*  - Based on code by BARRAGAN &lt;http://people.interaction-ivrea.it/h.barragan&gt; 
+*  - and code from HC Gilje - http://hcgilje.wordpress.com/resources/rfid_id12_tagreader/
+*  - Modified for Arudino by djmatic
+*  - Modified for ID-12 and checksum by Martijn The - http://www.martijnthe.nl/
+*/
+ 
+// Code being read in
+byte code[6];
+ 
+void setup() 
+{
+    // connect to the serial port
+    Serial.begin(9600);
+}
+ 
+void loop() 
+{
+    byte i = 0;
+    byte val = 0;
+    byte checksum = 0;
+    byte bytesread = 0;
+    byte tempbyte = 0;
+ 
+    if (Serial.available() &gt; 0) 
+    {
+        // check for header 
+        if ((val = Serial.read()) == 2) 
+        {                  
+            bytesread = 0;
+ 
+            // read 10 digit code + 2 digit checksum
+            while (bytesread &lt; 12) 
+            {                        
+                if (Serial.available() &gt; 0) 
+                {
+                    val = Serial.read();
+ 
+                    // if header or stop bytes before the 10 digit reading 
+                    if ((val == 0x0D) || (val == 0x0A) || (val == 0x03) || (val == 0x02)) 
+                    {
+                        break; // stop reading
+                    }
+ 
+                    // Do Ascii/Hex conversion:
+                    if ((val &gt;= '0') &amp;&amp; (val &lt;= '9')) 
+                    {
+                        val = val - '0';
+                    }
+                    else if ((val &gt;= 'A') &amp;&amp; (val &lt;= 'F')) 
+                    {
+                        val = 10 + val - 'A';
+                    }
+ 
+                    // Every two hex-digits, add byte to code:
+                    if (bytesread &amp; 1 == 1) 
+                    {
+                        // make some space for this hex-digit by
+                        // shifting the previous hex-digit with 4 bits to the left:
+                        code[bytesread &gt;&gt; 1] = (val | (tempbyte &lt;&lt; 4));
+ 
+                        // If we're at the checksum byte,
+                        if (bytesread &gt;&gt; 1 != 5) 
+                        {
+                            // Calculate the checksum... (XOR)
+                            checksum ^= code[bytesread &gt;&gt; 1];
+                        }
+                    }
+                    else 
+                    {
+                        // Store the first hex digit first...
+                        tempbyte = val;
+                    }
+ 
+                    // ready to read next digit
+                    bytesread++;
+                }
+            }
+ 
+            // Output to Serial:
+ 
+            // if 12 digit read is complete
+            if (bytesread == 12) 
+            {                          
+                Serial.print(&quot;5-byte code: &quot;);
+                for (i = 0; i &lt; 5; i++) 
+                {
+                    if (code[i] &lt; 16) 
+                        Serial.print(&quot;0&quot;);
+                        
+                    Serial.print(code[i], HEX);
+                    Serial.print(&quot; &quot;);
+                }
+                Serial.println();
+ 
+                Serial.print(&quot;Checksum: &quot;);
+                Serial.print(code[5], HEX);
+                Serial.println(code[5] == checksum ? &quot; -- passed.&quot; : &quot; -- error.&quot;);
+                Serial.println();
+            }
+ 
+            bytesread = 0;
+        }
+    }
+}
+</code></pre><p>This code is taken <a href="http://playground.arduino.cc/Code/ID12">directly from the Arduino Playground site</a>. I am a huge fan of not re-inventing the wheel if you don&rsquo;t have to. It is a little more complex than most sample code for the ID-20 as it converts the ASCII characters into their HEX values and performs the checksum calculation. When in ASCII mode, the ID-20 will send back a string of ASCII characters. There are 12 characters we care about. 10 are the ID of the card and 2 are the checksum digits for error checking. Check the <a href="http://dlnmh9ip6v2uc.cloudfront.net/datasheets/Sensors/ID/ID-2LA,%20ID-12LA,%20ID-20LA2013-4-10.pdf">data sheet</a> on page 4 for details about the data format.</p>
+<p>This sketch will output the card&rsquo;s ID code to the <a href="http://www.arduino.cc/en/Guide/Environment#serialmonitor">serial console</a> in the Arduino IDE. Save the ID codes for cards you want to grant access to the door.</p>
+<p>With the test circuit setup and the ID-20 Test sketch loaded on the Arduino, you can test out the RFID reader.</p>
+<p>A few notes:</p>
+<ul>
+<li>If an error occurs while uploading a sketch from the Arduino IDE to the Arduino itself, try disconnecting Pin 0 (RX) on the Arduino. After uploading the sketch, you can reconnect the pin.</li>
+<li>The ID-20 will read a card once while it is in range, and not read the card again. You will have to pull the card out of range and re-scan the card. This is by design.</li>
+</ul>
+<p>In the final project, I did not use pin 10 (the LED/beeper pin) on the ID-20. Instead, I just controlled an LED to light up green when a card is granted access and red when a card is denied access. You can easily do both (have two LEDs) or use a single LED for access indicator and wire a buzzer/beeper up to pin 10 on the ID-20. Have it your way!</p>
+
+<div class="img-container">
+
+
+	
+	<a href="20141231_154838.jpg">
+	
+
+	<img src="20141231_154838.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">ID-20 test circuit with access LED. Here I have the LED hooked to the Arduino and set it to light up green when a card is granted access. You can&#39;t really tell by just the picture, but the LED&#39;s blue pin is still wired to pin 10 on the ID-20. This is incorrect and should have been disconnected. I&#39;ll just chalk that up to poor photo timing!</div>
+	
+</div>
+
+<p>A note on card access: you will want to be able to grant access to certain RFID cards as mentioned. The easiest way is to hard-code IDs into your program (as I did in the final sketch, shown later on). You can make more sophisticated systems if you so desire, such as having &ldquo;ADD&rdquo; / &ldquo;DELETE&rdquo; cards. Or add an Ethernet/Wifi interface and communicate with a database of validated ID numbers!</p>
+<h2 id="the-door-strike">The Door Strike</h2>
+<p>The <a href="http://en.wikipedia.org/wiki/Electric_strike">electric door strike</a> is what controls access to the chosen door. The electric strike operates similarly to a regular, fixed door strike. When locked, the latchbar of the strike is in a fixed position, forcing the door knob to be turned before the door can be opened. The latchbar is ramped, allowing the locking latch in the door to close normally (think when you just push a door closed without turning the knob). What makes an electric strike different is its ability to unlock the latchbar from its fixed position into a movable one. When the strike is unlocked, the door can be pushed open without turning the door knob. Note that the door knob can still operate as normal - if the door knob itself is unlocked, the door can open and close normally no matter what the state of the electric strike.</p>
+<p>This was a quick time frame project, just a couple days, so I installed the strike into a test door of no importance. A little hacking of the door frame was required to fit the strike, as this was just a simple wooden frame.</p>
+<div class="list-img-container">
+	
+	<a href="existing_strike.jpg">
+	
+
+	<img class="list-img" src="existing_strike.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">The existing door strike.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="existing_door.jpg">
+	
+
+	<img class="list-img" src="existing_door.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">The existing door strike.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="hole_cut.jpg">
+	
+
+	<img class="list-img" src="hole_cut.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">The modified frame to fit the electric strike.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="test_fit.jpg">
+	
+
+	<img class="list-img" src="test_fit.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">A test fit of the electric strike in the frame.</div>
+	
+</div>
+
+<p>I used the <a href="http://www.sdcsecurity.com/25-Series-Electric-Strike.htm">SDC 25-4U Electric Door Strike</a>.</p>
+<ul>
+<li><a href="downloads/25SeriesStrike_Datasheet.pdf">Datasheet PDF</a></li>
+<li><a href="downloads/INST-25Series.pdf">Installation sheet PDF</a></li>
+</ul>
+<p>It allows for both &ldquo;fail safe&rdquo; and &ldquo;fail secure&rdquo; operation:</p>
+<ul>
+<li><strong>Fail Safe:</strong> strike is unlocked when there is no power provided to the strike.</li>
+<li><strong>Fail Secure:</strong> strike is locked when there is no power provided to the strike.</li>
+</ul>
+<p>It allows for operation on either 200mA @ 12VDC or 100mA @ 24VDC. It also provides a latch bolt monitor circuit that will allow you to monitor if the door is open or closed.</p>
+
+<div class="img-container">
+
+
+	
+	<a href="door-strike-wire.jpg">
+	
+
+	<img src="door-strike-wire.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">Wiring and fail-screw positioning for the SDC 25 Series door strike.</div>
+	
+</div>
+
+<p>I decided to go with the fail-secure configuration. I also decided not to use the latch bolt monitor.</p>
+
+<div class="img-container">
+
+
+	
+	<a href="door-strike-wire-2.jpg">
+	
+
+	<img src="door-strike-wire-2.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">Door strike wiring. I did not use the latch bolt monitor, so I wrapped the monitor wires up out of the way.</div>
+	
+</div>
+
+<h2 id="controlling-the-strike">Controlling the Strike</h2>
+<p>To step back for a second: we now have an RFID reader and a controller that can identify whether a certain RFID card is granted access when it is read. We also have a door strike for the door. Now, the two need to be linked together.</p>
+<p>I used the fail-secure configuration for the door strike, so it will always be locked when no power is applied to it. To unlock the strike, power is applied. We want the Arduino to control this flow of power. To do this:</p>
+<ul>
+<li>Create a circuit that is disconnected when the door should be locked.</li>
+<li>Complete the circuit for a period of time (say, 5 seconds) when a card is granted access to the door.</li>
+<li>Break the circuit to re-lock the door.</li>
+</ul>
+<p>Since the Arduino operates with 5V and the door strike with 12V, we will need to use a transistor. The transistor essentially acts as a switch, controlling the circuit just described.</p>
+
+<div class="img-container">
+
+
+	
+	<a href="5V-12V-Transistor-Control-Circuit.png">
+	
+
+	<img src="5V-12V-Transistor-Control-Circuit.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">5V-12V Transistor Control Circuit.</div>
+	
+</div>
+
+<p>When a 5V control signal is sent to the base of the transistor, the circuit for the electric strike will be completed and the door unlocked. This control signal is provided from one of the output pins on the Arduino. When a card is granted access, voltage is applied to that output pin for a set period of time.</p>
+<p>There is a great write-up on transistors <a href="https://www.techhouse.org/~dmorris/projects/tutorials/transistor.switches.pdf">here</a> by Dan Morris that was of great help. Check it out!</p>
+<h2 id="power">Power</h2>
+<p>For convenience, I wanted to power both the Arduino and door strike from the same power supply. I had a 110VAC to 12VDC power converter (&ldquo;wall wart&rdquo;, &ldquo;power brick&rdquo;, or whatever you call it) laying around to use. This is perfect for the door strike, but since the Arduino operates with 5V, a voltage regulator is needed to provide the Arduino with proper voltage.</p>
+
+<div class="img-container">
+
+
+	
+	<a href="Voltage-Regulator.png">
+	
+
+	<img src="Voltage-Regulator.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">Voltage regulator circuit. The output from the voltage regulator is fed into the voltage input (Vin) on the Arduino.</div>
+	
+</div>
+
+<p>The capacitors provide stability from fluctuations in the supplied voltage from the power source (its a cheap AC-DC converter). At least that&rsquo;s my understanding. To be honest, I&rsquo;m not sure of the &ldquo;proper&rdquo; values for the two capacitors, they don&rsquo;t have to be exactly what I specified in the schematic. In my implementation, I used a 4.7 uF capacitor between the 5V output and ground because I had one on hand.</p>
+<p>It should be noted that all components need to be on a common ground, so make sure that all grounds (including the ground pin on the Arduino) are connected to the ground coming from the power supply.</p>
+
+<div class="img-container">
+
+
+	
+	<a href="test-psu.jpg">
+	
+
+	<img src="test-psu.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">Testing the power supply. Note the coaxial power jack that the power supply is plugged into - much cleaner than hacking off the end of the power supply cord itself.</div>
+	
+</div>
+
+<h2 id="the-final-circuit">The Final Circuit</h2>
+<p>With everything tested, the final circuit is complete.</p>
+
+<div class="img-container">
+
+
+	
+	<a href="Final-Circuit.png">
+	
+
+	<img src="Final-Circuit.png" 
+
+	
+	width=600
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">The final circuit schematic for the project.</div>
+	
+</div>
+
+<p>For the Arduino:</p>
+<ul>
+<li>Pin 0 (RX) is for receiving data from the RFID reader.</li>
+<li>Pin 7 is the control signal for opening/closing the door strike.</li>
+<li>Pin 9, 10, and 11 are for the blue, green, and red pins of the access indicator LED.</li>
+</ul>
+<p>Everything is powered from the single 12V power source.</p>
+<h2 id="the-final-sketch">The Final Sketch</h2>
+<p>Here is the final sketch for the Arduino. As I noted previously, I did not write this entire program. I adapted <a href="http://playground.arduino.cc/Code/ID12">some code</a> to fit my needs.</p>
+<p>The &ldquo;allowedCard1&rdquo; variable holds the code for the card I want to grant access for. In this case, it&rsquo;s just all zeros. You would want to put the correct values into this array for the card you want to grant access.</p>
+<pre><code>/*
+* Arduino RFID Door Strike Project
+*  - Victor Bushong
+*
+* Code adapated from: http://playground.arduino.cc/Code/ID12
+*  - Based on code by BARRAGAN &lt;http://people.interaction-ivrea.it/h.barragan&gt; 
+*  - and code from HC Gilje - http://hcgilje.wordpress.com/resources/rfid_id12_tagreader/
+*  - Modified for Arudino by djmatic
+*  - Modified for ID-12 and checksum by Martijn The - http://www.martijnthe.nl/
+*/
+ 
+// Pin variables
+int strikePin = 7;
+int redPin = 9;
+int greenPin = 10;
+int bluePin = 11;
+ 
+// Code being read in
+byte code[6];
+ 
+// ID of the card to grant access to. In HEX format, so prefix with 0x
+byte allowedCard1[5] = { 0x00, 0x00, 0x00, 0x00, 0x00 };
+ 
+void setup() 
+{
+    // connect to the serial port
+    Serial.begin(9600);
+ 
+    // Setup pins
+    pinMode(strikePin, OUTPUT);
+    pinMode(greenPin, OUTPUT);
+    pinMode(redPin, OUTPUT);
+    pinMode(bluePin, OUTPUT);
+}
+ 
+void loop() 
+{
+    byte i = 0;
+    byte val = 0;
+    byte checksum = 0;
+    byte bytesread = 0;
+    byte tempbyte = 0;
+ 
+    if (Serial.available() &gt; 0) 
+    {
+        // check for header 
+        if ((val = Serial.read()) == 2) 
+        {                  
+            bytesread = 0;
+ 
+            // read 10 digit code + 2 digit checksum
+            while (bytesread &lt; 12) 
+            {                        
+                if (Serial.available() &gt; 0) 
+                {
+                    val = Serial.read();
+ 
+                    // if header or stop bytes before the 10 digit reading 
+                    if ((val == 0x0D) || (val == 0x0A) || (val == 0x03) || (val == 0x02)) 
+                    {
+                        break; // stop reading
+                    }
+ 
+                    // Do Ascii/Hex conversion:
+                    if ((val &gt;= '0') &amp;&amp; (val &lt;= '9')) 
+                    {
+                        val = val - '0';
+                    }
+                    else if ((val &gt;= 'A') &amp;&amp; (val &lt;= 'F')) 
+                    {
+                        val = 10 + val - 'A';
+                    }
+ 
+                    // Every two hex-digits, add byte to code:
+                    if (bytesread &amp; 1 == 1) 
+                    {
+                        // make some space for this hex-digit by
+                        // shifting the previous hex-digit with 4 bits to the left:
+                        code[bytesread &gt;&gt; 1] = (val | (tempbyte &lt;&lt; 4));
+ 
+                        // If we're at the checksum byte,
+                        if (bytesread &gt;&gt; 1 != 5) 
+                        {
+                            // Calculate the checksum... (XOR)
+                            checksum ^= code[bytesread &gt;&gt; 1];
+                        }
+                    }
+                    else 
+                    {
+                        // Store the first hex digit first...
+                        tempbyte = val;
+                    }
+ 
+                    // ready to read next digit
+                    bytesread++;
+                }
+            }
+ 
+            // Output to Serial:
+ 
+            // if 12 digit read is complete
+            if (bytesread == 12) 
+            {                          
+                Serial.print(&quot;5-byte code: &quot;);
+                for (i = 0; i &lt; 5; i++) 
+                {
+                    if (code[i] &lt; 16) 
+                        Serial.print(&quot;0&quot;);
+                        
+                    Serial.print(code[i], HEX);
+                    Serial.print(&quot; &quot;);
+                }
+                Serial.println();
+ 
+                Serial.print(&quot;Checksum: &quot;);
+                Serial.print(code[5], HEX);
+                Serial.println(code[5] == checksum ? &quot; -- passed.&quot; : &quot; -- error.&quot;);
+                Serial.println();
+                
+                // Don't validate card if checksum failed
+                if (code[5] != checksum)
+                    return;
+                
+                // Check if card has access
+                validateCard();
+            }
+ 
+            bytesread = 0;
+        }
+    }
+}
+ 
+/**
+* Determines if a card has access and acts accordingly.
+*/
+void validateCard()
+{
+    // Match each digit of the ID
+    for (int i = 0; i &lt; 5; i++) 
+    {
+        // If mis-match detected, the card is invalid
+        if (code[i] != allowedCard1[i])
+        {
+            denyAccess();
+            return;
+        }
+    }
+    
+    // If you make it this far, card is good
+    grantAccess();
+}
+ 
+/**
+* Unlocks the door for a valid card.
+*/
+void grantAccess()
+{
+    Serial.println(&quot;Valid Card -- Access Granted&quot;);
+    
+    digitalWrite(strikePin, HIGH);    // Unlock the strike
+    digitalWrite(greenPin, HIGH);    // Light Green LED
+    delay(5000);                      // Wait for 5 seconds
+    digitalWrite(strikePin, LOW);    // Lock the strike    
+    digitalWrite(greenPin, LOW);    // Shut off LED    
+}
+ 
+/**
+* Denies access to a card.
+*/
+void denyAccess()
+{
+    Serial.println(&quot;Invalid Card -- Access Denied&quot;);
+    
+    digitalWrite(redPin, HIGH);    // Light Red LED
+    delay(5000);                  // Wait for 5 seconds
+    digitalWrite(redPin, LOW);    // Shut off LED    
+}
+</code></pre><h2 id="building-the-project">Building the Project</h2>
+<p>At this point everything worked, but things needed shrunk down into a nice, neat package for final installation.</p>
+<p>My approach was to break the project into three main components:</p>
+<ul>
+<li>Main control box
+<ul>
+<li>Connected to power supply</li>
+<li>Holds the Arduino</li>
+<li>Holds voltage regulator circuit</li>
+<li>Holds transistor circuit for controller the strike</li>
+<li>Hidden somewhere</li>
+</ul>
+</li>
+<li>RFID reader module
+<ul>
+<li>Holds the ID-20 RFID reader</li>
+<li>Holds the access indicator LED</li>
+<li>Mounted in wall outside door</li>
+</ul>
+</li>
+<li>Door strike
+<ul>
+<li>Mounted in the door frame</li>
+</ul>
+</li>
+</ul>
+<h3 id="main-control-box-to-rfid-reader">Main Control Box to RFID Reader</h3>
+<p>I decided to use category 5 cable terminated with RJ-45 connectors (Ethernet cables) to connected the modules together. Ethernet cables provide a clean interface with 8 different connections at our disposal. Now, the ideal way to do this is to get RJ-45 sockets to mount into the project enclosure for a clean installation. I was scrunched for time and had to settle with an uglier approach, as you will see, using RJ-45 couplers - its the only thing I could get a hold of on short notice.</p>
+<p>Here are the pin configurations I used:</p>
+<ol>
+<li>+5V</li>
+<li>GND</li>
+<li>RFID Data</li>
+<li><em>not used</em></li>
+<li><em>not used</em></li>
+<li>Status LED Red</li>
+<li>Status LED Green</li>
+<li>Status LED Blue</li>
+</ol>
+<h3 id="main-control-box-to-door-strike">Main Control Box to Door Strike</h3>
+<p>For the connection between the main control box and the door strike, I used molex connectors connectors I had laying around. Molex connectors slightly annoy me. There are more elegant solutions, but again, it&rsquo;s what I had laying around. There are only two connections between the door strike and the main control box that connect to the positive and negative leads coming out of the strike.</p>
+<h3 id="assembling-the-rfid-module">Assembling the RFID Module</h3>
+<div class="list-img-container">
+	
+	<a href="rfid-module-01.jpg">
+	
+
+	<img class="list-img" src="rfid-module-01-sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">Laying out the components for the RFID module.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="rfid-module-02.jpg">
+	
+
+	<img class="list-img" src="rfid-module-02-sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">Adding some small jumpers to make necessary connections. The ID-20 sits on top of this. The process required a lot of test fitting and patience.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="rfid-module-03.jpg">
+	
+
+	<img class="list-img" src="rfid-module-03-sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">Test fitting the connections that will be made with the pins on the ID-20 itself.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="rfid-module-04.jpg">
+	
+
+	<img class="list-img" src="rfid-module-04-sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">Another view of the test fitting.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="rfid-module-05.jpg">
+	
+
+	<img class="list-img" src="rfid-module-05-sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">The RFID module in the soldering station.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="rfid-module-06.jpg">
+	
+
+	<img class="list-img" src="rfid-module-06-sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">The RFID module fully soldered.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="rfid-module-07.jpg">
+	
+
+	<img class="list-img" src="rfid-module-07-sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">Assembled RFID module from the front side with LED on top.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="rfid-module-08.jpg">
+	
+
+	<img class="list-img" src="rfid-module-08-sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">RFID module mounted in a wall box.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="rfid-module-09.jpg">
+	
+
+	<img class="list-img" src="rfid-module-09-sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">RFID module mounted in a wall box. I rigged a small L-bracket from leftover plastic of a project box to mount the RFID module into the wall box. You can see the screw in the top of the wall box that holds the module in place. Also note the Ethernet cable protruding from the top of the box. This is coupled with an extension patch cable going to the main control box.</div>
+	
+</div>
+
+<h3 id="assembling-the-main-control-box">Assembling the Main Control Box</h3>
+<p>The main control components are housed in a RadioShack project box. I drilled a hole for the power supply connection and a hole to feed out the connections to the RFID module and the door strike (ugly, as noted before, but hey). To fit everything in the box, I created a mount so the Arduino is slightly elevated over the other components. This also provides access to the Arduino&rsquo;s USB port while the device is still mounted in the box. The Arduino can also be easily removed, which was something I wanted in case I want to use it for something else.</p>
+<p>It&rsquo;s worth noting that you can ditch the Arduino for the final install and get an <a href="https://www.sparkfun.com/products/10524">ATmega238 with Arduino Optiboot</a>. This will reduce the size of your final install and allow you to re-use the Arduino for your next project. Check out <a href="http://www.arduino.cc/en/Main/Standalone">this link</a> for details.</p>
+<div class="list-img-container">
+	
+	<a href="main_01.jpg">
+	
+
+	<img class="list-img" src="main_01.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">The project box for the main components.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="main_02.jpg">
+	
+
+	<img class="list-img" src="main_02_sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">Laying out some main components.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="main_03.jpg">
+	
+
+	<img class="list-img" src="main_03_sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">Test fitting inside of the project box.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="main_04.jpg">
+	
+
+	<img class="list-img" src="main_04_sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">Little feet I made to mount the main component board inside the project box. I hacked up another RadioShack project box.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="main_05.jpg">
+	
+
+	<img class="list-img" src="main_05_sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">Wiring connections for the Ethernet cable connections. For the better option, look at https://www.sparkfun.com/products/8534.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="main_06.jpg">
+	
+
+	<img class="list-img" src="main_06_sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">Mounting stands to elevate the Arduino. Some motherboard standoffs fastened into the stands work perfectly for mounting the Arduino.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="main_07.jpg">
+	
+
+	<img class="list-img" src="main_07_sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">More test fitting.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="main_08.jpg">
+	
+
+	<img class="list-img" src="main_08_sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">More test fitting.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="main_09.jpg">
+	
+
+	<img class="list-img" src="main_09_sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">Gluing the Arduino stands into place. The two stands on the left are super-glued, but the third stand required some extra help via hot glue.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="main_10.jpg">
+	
+
+	<img class="list-img" src="main_10_sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">The final fit with everything secured in place.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="main_11.jpg">
+	
+
+	<img class="list-img" src="main_11_sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">Note the available access to the Arduino’s USB port.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="main_12.jpg">
+	
+
+	<img class="list-img" src="main_12_sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">The connections for pins 7 (strike control), 9 (blue LED), 10 (green LED), and 11 (red LED).</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="main_13.jpg">
+	
+
+	<img class="list-img" src="main_13_sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">The connections for voltage in and ground.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="main_14.jpg">
+	
+
+	<img class="list-img" src="main_14_sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">Power supply input, molex output (to door strike), RJ-45 output (to RFID module).</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="main_15.jpg">
+	
+
+	<img class="list-img" src="main_15_sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">Final box all closed up.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="main_16.jpg">
+	
+
+	<img class="list-img" src="main_16_sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">Final box all closed up.</div>
+	
+</div>
+
+<h2 id="installation">Installation</h2>
+<p>With the components all completed, the only thing left to do was install and test.</p>
+<div class="list-img-container">
+	
+	<a href="install-01.jpg">
+	
+
+	<img class="list-img" src="install-01-sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">I put the main control box on a shelf in the secured room for testing. The connections to the RFID module and the door strike were ran to the appropriate places. After testing, I mounted a nice hard drive cage in a cozy location to hold the box and neatened up the wiring.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="install-02.jpg">
+	
+
+	<img class="list-img" src="install-02-sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">Installing the wall box into the wall outside the door.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="install-03.jpg">
+	
+
+	<img class="list-img" src="install-03-sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">A plate with a hole cut out for the LED.</div>
+	
+</div>
+
+<div class="list-img-container">
+	
+	<a href="install-04.jpg">
+	
+
+	<img class="list-img" src="install-04-sm.jpg" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="list-img-caption">Yay!</div>
+	
+</div>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>This was a fun project and hopefully this write-up can help someone out. This project can be expanded on in an infinite number of ways, so put your imagination to work!</p>
+<h2 id="other-references">Other References</h2>
+<p>Here are a couple other articles that were helpful:</p>
+<ul>
+<li><a href="http://www.instructables.com/id/Arduino-RFID-Door-Lock/?ALLSTEPS">http://www.instructables.com/id/Arduino-RFID-Door-Lock/?ALLSTEPS</a></li>
+<li><a href="http://bildr.org/2011/02/rfid-arduino/">http://bildr.org/2011/02/rfid-arduino/</a></li>
+</ul>
+</div>
+
+  </article>
+</main>
+<footer>
+  <div>
+    <div></div>
+  </div>
+</footer>
+</body>
+</html>

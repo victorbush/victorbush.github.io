@@ -168,6 +168,11 @@ Image
 	margin-top: 0.2rem;
 }
 
+.img-gallery {
+	display: inline-block;
+	margin: 1rem 1rem 1rem 0;
+}
+
 /*
 List-img
 */

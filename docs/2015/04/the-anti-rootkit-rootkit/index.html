@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Anti-Rootkit Rootkit - victorbush</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Staatliches&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Antic+Slab&display=swap" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="/css/normalize.css">
+<link rel="stylesheet" type="text/css" href="/css/victorbush.css">
+</head>
+<body>
+<header>
+  <div class="site-header">
+    <a href="http://victorbush.github.io/">
+      <img src="/img/victorbush-icon.png" alt="victorbush" />
+    </a>  
+  </div>
+
+  <nav></nav>
+</header>
+<main>
+  <article>
+    
+<div class="cover" style="background-image: url(cover.jpg)">
+</div>
+<div class="meta">
+  <div>April 21, 2015</div>
+  </div>
+<div class="title">
+  <h1>The Anti-Rootkit Rootkit</h1>
+  </div>
+<div class="content">
+  <p>I was recently analyzing a piece of malware that used a user-mode rootkit to hide itself in the process list. This makes the malware difficult to actively debug. I wondered if I could change the tides by using my own simple rootkit to UN-hide the malware. Turns out it’s possible.</p>
+<h2 id="brief">Brief</h2>
+<p>All analysis is performed in an isolated virtual machine for safety. This project utilized the following:</p>
+<ul>
+<li>Oracle VirtualBox</li>
+<li>Windows XP SP3 (x86)</li>
+<li>Visual Studio 2010</li>
+<li>Windows Driver Kit Version 7.1.0</li>
+</ul>
+<p>I can’t guarantee that the procedures outlined here will work with newer (or 64-bit) versions of Windows. These techniques use offsets into kernel structures that are (most likely) specific to certain versions of Windows – you would need determine the appropriate offsets for your target platform. WinDbg can be used for such a task.</p>
+<p>Is this project actually useful for anything? I don’t know, but you feel cool doing it.</p>
+<h2 id="source-code">Source Code</h2>
+<p>The project source can be found here: <a href="https://bitbucket.org/victorbush/dkom.prochide/overview">https://bitbucket.org/victorbush/dkom.prochide/overview</a></p>
+<h2 id="primary-references">Primary References</h2>
+<p>There are two primary references I used for this project:</p>
+<ul>
+<li>Malware Analyst’s Cookbook [1]</li>
+<li>Alex Ionescu’s blog on OpenRCE [2]</li>
+</ul>
+<p>These got me going in the right direction. There’s also a nice Blackhat presentation on DKOM by Jaime Butler that has relevant information [3].</p>
+<h2 id="windows-processes">Windows Processes</h2>
+<p>Each process in Windows is given an _EPROCESS structure. These structures are in non-paged areas of kernel-allocated memory [1]. These _EPROCESS structures track many things about the process, such as the process id, parent process, creation time, etc. The table below shows the relevant objects inside the _EPROCESS structure and their offsets.</p>
+
+<div class="img-container">
+
+
+	
+	<a href="eprocess.png">
+	
+
+	<img src="eprocess.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">_EPROCESS Structure</div>
+	
+</div>
+
+<p>Important for our purposes is the ActiveProcessLinks object. This object contains two pointers, a forward link (Flink) and backward link (Blink). These pointers form a doubly-linked list of all running processes. The Flink of one process points to the Flink of the next process – this repeats back to the first process in the list, forming a circle. The Blink of one process points to the Flink of the previous process (note that it does NOT point to the Blink of the previous process).</p>
+<p>Here is an example of how Flinks and Blinks point. The value boxes are color coordinated with the memory addresses they point to.</p>
+
+<div class="img-container">
+
+
+	
+	<a href="eprocess_ex.png">
+	
+
+	<img src="eprocess_ex.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">Example of Flink and Blink pointers.</div>
+	
+</div>
+
+<h2 id="hiding-a-process">Hiding a Process</h2>
+<p>To hide a process, one can modify the Flinks and Blinks of _EPROCESS blocks to remove a process from the active process chain. Take the previous example, for instance. Let’s hide Process B.</p>
+
+<div class="img-container">
+
+
+	
+	<a href="eprocess_ex_2.png">
+	
+
+	<img src="eprocess_ex_2.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">Example of a hidden process using modified Flink/Blink pointers.</div>
+	
+</div>
+
+<p>Notice the two values that have been changed – Process A’s Flink was updated to point to Process C, and Process C’s Blink was updated to point to Process A. Process B is now hidden.</p>
+<p>The question is why does the process continue to run? Because the scheduling for Windows is done based on threads, <em>not</em> processes [3].</p>
+<h2 id="manipulating-the-_eprocess-structure">Manipulating the _EPROCESS Structure</h2>
+<p>The _EPROCESS structure resides in kernel memory. Typically one would need to write a driver to get kernel-level access. However, there is a native API function called ZwSystemDebugControl that allows us to read and write kernel memory from user-mode applications [1].</p>
+<p>The procedure for using ZwSystemDebugControl is outlined nicely in the <em>Malware Analyst’s Cookbook</em> [1] with code cross-reference to the OpenRCE blog [2].</p>
+<h3 id="1-get-debug-privileges">1. Get debug privileges</h3>
+<p>First we need to get proper access by using the RtlAdjustPrivilege function with the SE_DEBUG_PRIVILEGE option.</p>
+<pre><code>BOOLEAN old;
+RtlAdjustPrivilege(SE_DEBUG_PRIVILEGE, TRUE, FALSE, &amp;old);
+</code></pre><h3 id="2-find-the-kernel-execute-module-in-memory">2. Find the kernel execute module in memory</h3>
+<p>The kernel execute module exports a global variable called PsInitialSystemProcess. As you might have guessed, it is the initial system process – more specifically, it points to the address of the _EPROCESS block for that process. It serves as our entry point into the process chain.</p>
+<p>The NtQuerySystemInformation function can get the SystemModuleInformation structure, which will contain the address to the kernel execute module.</p>
+<pre><code>RTL_PROCESS_MODULES moduleInfo;
+NtQuerySystemInformation(SystemModuleInformation, &amp;moduleInfo, sizeof(moduleInfo), NULL);
+</code></pre><p>We can now extract the base address of the kernel execute module:</p>
+<pre><code>ntoskrnlBase = (ULONG)moduleInfo.Modules[0].ImageBase;
+</code></pre><p>Now we can get a handle to the module with LoadLibraryA using the extracted address.</p>
+<h3 id="3-get-psinitialsystemprocess">3. Get PsInitialSystemProcess</h3>
+<p>With the handle to the kernel module, get the address of the PsInitialSystemProcess variable with GetProcAddress.</p>
+<pre><code>ntoskrnl = LoadLibraryA(ntoskrnlFileName);
+varAddr = (ULONG)GetProcAddress(ntoskrnl, &quot;PsInitialSystemProcess&quot;) – (ULONG)ntoskrnl + ntoskrnlBase;
+</code></pre><p>Now that we have the address to PsInitialSystemProcess, we can read it’s memory to get the address to the _EPROCESS block for the initial system process. This is done using the NtSystemDebugControl function. The OpenRCE blog provides a wrapper function called ReadKernelMemory around NtSystemDebugControl that makes it easier to use.</p>
+<pre><code>NTSTATUS
+ReadKernelMemory(IN PVOID BaseAddress, OUT PVOID Buffer, IN ULONG Length) {
+    NTSTATUS Status;
+    SYSDBG_VIRTUAL DbgMemory;
+ 
+    DbgMemory.Address = BaseAddress;
+    DbgMemory.Buffer = Buffer;
+    DbgMemory.Request = Length;
+ 
+    Status = NtSystemDebugControl(SysDbgReadVirtual,
+        &amp;DbgMemory,
+        sizeof(DbgMemory),
+        NULL,
+        0,
+        NULL);
+    return Status;
+}
+</code></pre><p>We use this function to read the PsInitialSystemProcess variable:</p>
+<pre><code>ReadKernelMemory((PVOID)varAddr,
+        &amp;PsInitialSystemProcess,
+        sizeof(PsInitialSystemProcess));
+</code></pre><h3 id="4-do-the-un-hiding">4. Do the un-hiding</h3>
+<p>We take as input the virtual address of the process we want to unhide and the process id of a running process (one that isn’t hidden). We will use this running process to insert our hidden process back in the process chain by using and modifying the values of its Flink and Blink pointers.</p>
+<p>Check out the source for the full unhide function, but here is a snippet:</p>
+<pre><code>// Store address to my flink variable (not this is not the value stored in my Flink)
+myFlinkAddr = addr + activeProcLinksOffset;
+    
+// Get address to EPROCESS block of process that we are going to insert our process AFTER
+if (!getEprocessAddr(procIdPrev, &amp;prevProcAddr)) {
+    printf(&quot;Error: could not find process id %lu.\r\n&quot;, procIdPrev); return FALSE; 
+}
+prevProcFlinkAddr = prevProcAddr + activeProcLinksOffset;
+ 
+// Get address to the Flink of the process that we are going to insert our process BEFORE
+// This is pointed to by the Flink of prevProc
+status = ReadKernelMemory((PVOID)(prevProcFlinkAddr),
+    &amp;nextProcFlinkAddr,
+    sizeof(nextProcFlinkAddr));
+if (!NT_SUCCESS(status)) { printf(&quot;Error reading Flink.\r\n&quot;); return FALSE; }
+ 
+// Update the prev process Flink value to point to my Flink addr
+status = WriteKernelMemory((PVOID)(prevProcFlinkAddr),
+    &amp;myFlinkAddr,
+    sizeof(myFlinkAddr));
+if (!NT_SUCCESS(status)) { printf(&quot;Error updating prev process Flink.\r\n&quot;); return FALSE; }
+ 
+// Update my Flink value to point to next process Flink addr
+status = WriteKernelMemory((PVOID)(myFlinkAddr),
+    &amp;nextProcFlinkAddr,
+    sizeof(nextProcFlinkAddr));
+if (!NT_SUCCESS(status)) { printf(&quot;Error updating my process Flink.\r\n&quot;); return FALSE; }
+ 
+// Update next proc Blink value to point to my Flink addr
+status = WriteKernelMemory((PVOID)(nextProcFlinkAddr + 0x4),
+    &amp;myFlinkAddr,
+    sizeof(myFlinkAddr));
+if (!NT_SUCCESS(status)) { printf(&quot;Error updating next process Blink.\r\n&quot;); return FALSE; }
+ 
+// Update my Blink value to point to prev proc Flink addr
+status = WriteKernelMemory((PVOID)(myFlinkAddr + 0x4),
+    &amp;prevProcFlinkAddr,
+    sizeof(prevProcFlinkAddr));
+if (!NT_SUCCESS(status)) { printf(&quot;Error updating my process Blink.\r\n&quot;); return FALSE; }
+</code></pre><h2 id="quick-test">Quick Test</h2>
+<p>The dkom_prochide source includes a few functions that come in handy:</p>
+<ul>
+<li>Hide a process given a process id.</li>
+<li>Un-hide a process given the address to the _EPROCESS block of a hidden process.</li>
+<li>Get the address to the _EPROCESS block of a process given a process id.</li>
+<li>Get the process id of a process given an address to its _EPROCESS</li>
+</ul>
+<p>Here is a quick test to verify everything is working. Grab a copy of Process Hacker (<a href="http://processhacker.sourceforge.net/">http://processhacker.sourceforge.net/</a>) as it will come in handy.</p>
+<p>First, start up a process – in this case, Solitaire.</p>
+
+<div class="img-container">
+
+
+	
+	<a href="sol-start2.png">
+	
+
+	<img src="sol-start2.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">Solitaire start up.</div>
+	
+</div>
+
+<p>Let’s find the address to the _EPROCESS block for that process.</p>
+<pre><code>dkom_prochide geteprocaddr 2812
+</code></pre>
+<div class="img-container">
+
+
+	
+	<a href="geteprocaddr.png">
+	
+
+	<img src="geteprocaddr.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">Get the _EPROCESS address.</div>
+	
+</div>
+
+<p>Now, let’s hide the process.</p>
+<pre><code>dkom_prochide hide 2812
+</code></pre>
+<div class="img-container">
+
+
+	
+	<a href="hide.png">
+	
+
+	<img src="hide.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">Hide the process.</div>
+	
+</div>
+
+<p>The process no longer shows up in the process list.</p>
+
+<div class="img-container">
+
+
+	
+	<a href="hidden.png">
+	
+
+	<img src="hidden.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">Process is hidden.</div>
+	
+</div>
+
+<p>You can get the process id for the hidden process by specifying its _EPROCESS address.</p>
+<pre><code>dkom_prochide getprocidbyaddr 0x86a7cda0
+</code></pre>
+<div class="img-container">
+
+
+	
+	<a href="getprocidbyaddr.png">
+	
+
+	<img src="getprocidbyaddr.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">Get process id by _EPROCESS address.</div>
+	
+</div>
+
+<p>Now let’s un-hide the process. We’ll re-insert the process into the process chain after process id 252.</p>
+<pre><code>dkom_prochide unhide 0x86a7cda0 252
+</code></pre>
+<div class="img-container">
+
+
+	
+	<a href="unhide.png">
+	
+
+	<img src="unhide.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">Un-hide the process.</div>
+	
+</div>
+
+<p>The process is now back in the list:</p>
+
+<div class="img-container">
+
+
+	
+	<a href="unhidden.png">
+	
+
+	<img src="unhidden.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">The process is now un-hidden.</div>
+	
+</div>
+
+<h2 id="using-our-anti-rootkit-rootkit">Using our Anti-Rootkit Rootkit</h2>
+<p>The test example is great, but let’s look at some real-world usage. Unfortunately, I did not code the ability to search for hidden processes and retrieve the addresses to their _EPROCESS blocks automatically. This may be possible – whether or not you can do it in user-mode with native APIs, I do not know. However, there are tools we can use when analyzing malware that have a hidden process that we want to debug.</p>
+<p>For this example, we will look at a real piece of malware. It unpacks itself at runtime, puts the unpacked code into memory in a new thread, and hides its process. We want to debug this process while it is running. I’m not sure if there are debuggers that can attach to hidden processes or not. OllyDbg could not (unless there’s a plugin, I’m not sure). Anyway, let’s continue.</p>
+<p>Process Hacker has the ability to search for hidden processes.</p>
+
+<div class="img-container">
+
+
+	
+	<a href="prochacker-hide.png">
+	
+
+	<img src="prochacker-hide.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">Process Hacker Hidden Processes.</div>
+	
+</div>
+
+<p>Click the “Scan” button to scan for hidden processes. They will show up highlighted in red. Below is the hidden malware process.</p>
+
+<div class="img-container">
+
+
+	
+	<a href="malware-hidden.png">
+	
+
+	<img src="malware-hidden.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">The hidden malware process.</div>
+	
+</div>
+
+<p>Double clicking on an entry in the list will give you plenty of details about the process; however, it does not give you the address to the _EPROCESS block, which we need to un-hide the process.</p>
+<p>Since we are analyzing in a virtual machine, we can dump the memory of the machine and analyze it in a frozen state. The Volatility framework (<a href="https://github.com/volatilityfoundation/volatility">https://github.com/volatilityfoundation/volatility</a>) is a great memory forensics framework for doing just that.</p>
+<p>First, we need to dump the virtual machine’s memory.</p>
+<p>For VirtualBox, get your virtual machine running to the point where you want to dump the memory. In the host system, use the following command to dump the memory to a file on the host system.</p>
+<pre><code>vboxmanage debugvm “Name of Virtual Machine” dump guestcore –filename memdump.elf
+</code></pre>
+<div class="img-container">
+
+
+	
+	<a href="vmdump.png">
+	
+
+	<img src="vmdump.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">VirtualBox memory dump.</div>
+	
+</div>
+
+<p>Now use the Volatility framework to analyze the dumped memory. The psscan process searches memory dumps for _EPROCESS structures (rather than following the process chain) to find the list of processes. You need to make sure to use the –V switch to display virtual memory addresses instead of physical ones.</p>
+<pre><code>python vol.py psscan –f “path-to-mem-dump-file” -V
+</code></pre>
+<div class="img-container">
+
+
+	
+	<a href="vol-psscan.png">
+	
+
+	<img src="vol-psscan.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">Volatility psscan command.</div>
+	
+</div>
+
+<p>Search the results for the process you are trying to unhide, and note it’s virtual address.</p>
+
+<div class="img-container">
+
+
+	
+	<a href="vol-entry.png">
+	
+
+	<img src="vol-entry.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">The hidden process found by psscan.</div>
+	
+</div>
+
+<p>Now that we have the address, we can use our dkom_prochide utility to un-hide the process.</p>
+<pre><code>dkom_prochide unhide 0x86b4c178 252
+</code></pre>
+<div class="img-container">
+
+
+	
+	<a href="malware-unhide.png">
+	
+
+	<img src="malware-unhide.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">Un-hide the malware process.</div>
+	
+</div>
+
+<p>Now the malware’s process is back in the process list.</p>
+
+<div class="img-container">
+
+
+	
+	<a href="malware-unhidden.png">
+	
+
+	<img src="malware-unhidden.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">Malware is now un-hidden.</div>
+	
+</div>
+
+<p>The process also shows up in OllyDbg’s attach window, so we can attach to and debug the process.</p>
+
+<div class="img-container">
+
+
+	
+	<a href="ollyattach.png">
+	
+
+	<img src="ollyattach.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">Malware now in OllyDbg attach window.</div>
+	
+</div>
+
+<h2 id="hide-the-debugger-from-malware">Hide the Debugger from Malware</h2>
+<p>The same malware we just looked at constantly scans the process list for certain process names it has on a blacklist and kills those processes (OllyDbg is one of them). Now, you could rename the executable. In OllyDbg’s case, there are some plugins that don’t work when you do this. So instead, why not hide OllyDbg with our little rootkit?</p>
+
+<div class="img-container">
+
+
+	
+	<a href="ollyhide.png">
+	
+
+	<img src="ollyhide.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">OllyDbg hidden.</div>
+	
+</div>
+
+<p>Now we can run the malware, perform our un-hide process, and debug with Olly!</p>
+<h2 id="parting-words">Parting Words</h2>
+<p>That’s it, have fun, be safe. Also, obligatory disclaimer: I take no responsibility for anything you do with the code provided.</p>
+<h2 id="references">References</h2>
+<p>[1] M. Ligh, S. Adair, B. Hartstein and M. Richard, Malware Analyst’s Cookbook and DVD: Tools and Techniques for Fighting Malicious Code, Indianapolis, IN: Wiley, 2010.</p>
+<p>[2] A. Ionescu, “Tips &amp; Tricks Part 2 – Putting ZwSystemDebugControl to good use”. <a href="http://www.openrce.org/blog/view/354/Tips_&amp;Tricks_Part_2-_Putting_ZwSystemDebugControl_to_good_use">http://www.openrce.org/blog/view/354/Tips_&amp;Tricks_Part_2-_Putting_ZwSystemDebugControl_to_good_use</a>.</p>
+<p>[3] J. Butler, “DKOM (Direct Kernel Object Manipulation)”. <a href="http://www.blackhat.com/presentations/win-usa-04/bh-win-04-butler.pdf">http://www.blackhat.com/presentations/win-usa-04/bh-win-04-butler.pdf</a>.</p>
+</div>
+
+  </article>
+</main>
+<footer>
+  <div>
+    <div></div>
+  </div>
+</footer>
+</body>
+</html>

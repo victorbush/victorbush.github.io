@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Projects on victorbush</title>
+    <link>http://victorbush.github.io/projects/</link>
+    <description>Recent content in Projects on victorbush</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    
+	<atom:link href="http://victorbush.github.io/projects/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Android Bus Tracker</title>
+      <link>http://victorbush.github.io/projects/android-bus-tracker/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://victorbush.github.io/projects/android-bus-tracker/</guid>
+      <description>The Gainesville Bus Tracker Android app was developed for a group project assignment for the Human Computer Interaction class (Spring 2015) at the University of Florida. Our group consisted of myself and two other students, Tianshuang Liu and Hengyu Chen. The goal of our project was to create an improved bus tracking app by adding additional search and route planning functionality.
+The app is no longer available on the Google Play Store, but some screenshots can be seen below.</description>
+    </item>
+    
+    <item>
+      <title>CPSC 493 Senior Project</title>
+      <link>http://victorbush.github.io/projects/cpsc-493-senior-project/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://victorbush.github.io/projects/cpsc-493-senior-project/</guid>
+      <description>For my senior undergrad project, I developed a simple, 2D Android game. The game used a custom OpenGL rendering engine and custom game engine, both built from the ground up. This was my first Android application as well as my first OpenGL project. I had spent quite some time exploring the Quake 2 engine source which provided some inspiration on how to layout my game engine.
+The Game The basic premise of the game is that you can control the direction of gravity by rotating your phone while playing.</description>
+    </item>
+    
+    <item>
+      <title>Goldfish RSS</title>
+      <link>http://victorbush.github.io/projects/goldfish-rss/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://victorbush.github.io/projects/goldfish-rss/</guid>
+      <description>Goldfish RSS was a podcast management system designed for a church in my hometown. The first few iterations of the program were Windows applications (see the old SourceForge project that would manage the XML feeds locally and upload the changes to the Web, along with any media files.
+The application was later rewritten into a PHP/MySQL Web app, allowing management from anywhere. It allowed for easy integration into the church&amp;rsquo;s Web site and could generate RSS feed XML on the fly for consumption by iTunes and other RSS consumers.</description>
+    </item>
+    
+  </channel>
+</rss>

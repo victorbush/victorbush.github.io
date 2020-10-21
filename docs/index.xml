@@ -17,7 +17,7 @@
       <pubDate>Sat, 21 Apr 2018 11:21:23 -0500</pubDate>
       
       <guid>http://victorbush.github.io/2018/04/lets-encrypt/</guid>
-      <description>Overview Example repo here.
+      <description>Example repo here.
 The goal of this example is to get a free SSL certificate from a legitimate Certificate Authority that automatically renews itself.
 The following requirements are imposed:
  use NGINX running in a Docker container. automatically generate and renew SSL certificates. automatically update NGINX configuration to use the new certificate. use Let&amp;rsquo;s Encrypt as the certificate authority (CA). use Cloudflare as the DNS provider.  This article describes the example in two sections:</description>
@@ -29,8 +29,81 @@ The following requirements are imposed:
       <pubDate>Sat, 07 Apr 2018 10:21:23 -0500</pubDate>
       
       <guid>http://victorbush.github.io/2018/04/nefs-edit/</guid>
-      <description>Overview The NeFS archive file format has been partially reversed engineered. The NeFS format is used in various games developed by Codemasters (such as DiRT 4) using their proprietary EGO game engine.
+      <description>The NeFS archive file format has been partially reversed engineered. The NeFS format is used in various games developed by Codemasters (such as DiRT 4) using their proprietary EGO game engine.
 The NeFS Edit tool was created to extract files from and modify these archive files. The tool has limitations and has issues with certain archives. Read the readme for more information. Binaries and source code provided as-is with no support.</description>
+    </item>
+    
+    <item>
+      <title>The Anti-Rootkit Rootkit</title>
+      <link>http://victorbush.github.io/2015/04/the-anti-rootkit-rootkit/</link>
+      <pubDate>Tue, 21 Apr 2015 11:21:23 -0500</pubDate>
+      
+      <guid>http://victorbush.github.io/2015/04/the-anti-rootkit-rootkit/</guid>
+      <description>I was recently analyzing a piece of malware that used a user-mode rootkit to hide itself in the process list. This makes the malware difficult to actively debug. I wondered if I could change the tides by using my own simple rootkit to UN-hide the malware. Turns out it’s possible.
+Brief All analysis is performed in an isolated virtual machine for safety. This project utilized the following:
+ Oracle VirtualBox Windows XP SP3 (x86) Visual Studio 2010 Windows Driver Kit Version 7.</description>
+    </item>
+    
+    <item>
+      <title>Tessellated Terrain Rendering with Dynamic LOD</title>
+      <link>http://victorbush.github.io/2015/01/tessellated-terrain-rendering-with-dynamic-lod/</link>
+      <pubDate>Sat, 17 Jan 2015 10:21:23 -0500</pubDate>
+      
+      <guid>http://victorbush.github.io/2015/01/tessellated-terrain-rendering-with-dynamic-lod/</guid>
+      <description>This report was for a project/presentation assignment for my Computer Graphics course in the Fall 2014 semester. The source code is available on BitBucket. Enjoy!
+Goals and Motivation Rendering large, detailed terrain meshes is an important issue in many graphics applications such as video games, simulators (flight, space, auto, world, etc.), and geographic information systems. The goal, as with many real-time rendering applications, is to render a high level of detail (LOD) without sacrificing efficiency and performance.</description>
+    </item>
+    
+    <item>
+      <title>Arduino RFID Door Strike</title>
+      <link>http://victorbush.github.io/2015/01/arduino-rfid-door-strike/</link>
+      <pubDate>Thu, 15 Jan 2015 10:21:23 -0500</pubDate>
+      
+      <guid>http://victorbush.github.io/2015/01/arduino-rfid-door-strike/</guid>
+      <description>I rediscovered a shelved project over Christmas break, something I had never gotten around to doing. It&amp;rsquo;s always nice to find an excuse to break out the soldering iron.
+The goal was to use an Arduino and an RFID reader to operate an electric door strike, granting or denying access to some door.
+Arduinos are micro-controller boards that ease some of the complexity of developing electronics projects. They are great fun to play with and the possibilities they present are virtually endless.</description>
+    </item>
+    
+    <item>
+      <title>Midtown Madness</title>
+      <link>http://victorbush.github.io/2015/01/midtown-madness/</link>
+      <pubDate>Sat, 10 Jan 2015 10:21:23 -0500</pubDate>
+      
+      <guid>http://victorbush.github.io/2015/01/midtown-madness/</guid>
+      <description>Ah, the nostalgia. Midtown Madness is one of my all-time favorite video games. If you are not familiar with said product, read up on it.
+It is a worthy topic for a first entry. I could reminisce for paragraphs, but I&amp;rsquo;ll spare you. This post is archival in nature for two items: the VCK toolset and the Mercedes CLK.
+VCK Toolset The developers of Midtown Madness released a &amp;ldquo;Vehicle Creation Kit&amp;rdquo; (VCK) to allow users to create custom cars for use in game.</description>
+    </item>
+    
+    <item>
+      <title>Android Bus Tracker</title>
+      <link>http://victorbush.github.io/projects/android-bus-tracker/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://victorbush.github.io/projects/android-bus-tracker/</guid>
+      <description>The Gainesville Bus Tracker Android app was developed for a group project assignment for the Human Computer Interaction class (Spring 2015) at the University of Florida. Our group consisted of myself and two other students, Tianshuang Liu and Hengyu Chen. The goal of our project was to create an improved bus tracking app by adding additional search and route planning functionality.
+The app is no longer available on the Google Play Store, but some screenshots can be seen below.</description>
+    </item>
+    
+    <item>
+      <title>CPSC 493 Senior Project</title>
+      <link>http://victorbush.github.io/projects/cpsc-493-senior-project/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://victorbush.github.io/projects/cpsc-493-senior-project/</guid>
+      <description>For my senior undergrad project, I developed a simple, 2D Android game. The game used a custom OpenGL rendering engine and custom game engine, both built from the ground up. This was my first Android application as well as my first OpenGL project. I had spent quite some time exploring the Quake 2 engine source which provided some inspiration on how to layout my game engine.
+The Game The basic premise of the game is that you can control the direction of gravity by rotating your phone while playing.</description>
+    </item>
+    
+    <item>
+      <title>Goldfish RSS</title>
+      <link>http://victorbush.github.io/projects/goldfish-rss/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://victorbush.github.io/projects/goldfish-rss/</guid>
+      <description>Goldfish RSS was a podcast management system designed for a church in my hometown. The first few iterations of the program were Windows applications (see the old SourceForge project that would manage the XML feeds locally and upload the changes to the Web, along with any media files.
+The application was later rewritten into a PHP/MySQL Web app, allowing management from anywhere. It allowed for easy integration into the church&amp;rsquo;s Web site and could generate RSS feed XML on the fly for consumption by iTunes and other RSS consumers.</description>
     </item>
     
   </channel>
