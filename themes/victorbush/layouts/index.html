@@ -6,20 +6,18 @@
   <h1>Articles</h1>
 </div>
 
-<ul>
-  {{ range (.Paginate ( where .Site.RegularPages "Type" "in" site.Params.mainSections )).Pages -}}
-  <li>{{ .Date.Format "2006-01-02" }} - <a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
-  {{ end -}}
-</ul>
-{{ template "_internal/pagination.html" . -}}
-
-<ul>
-  <li><a href="projects/android-bus-tracker">Gainesville Bus Tracker</a></li>
-  <li><a href="projects/cpsc-493-senior-project">CPSC-493 Android Game</a></li>
-  <li><a href="projects/goldfish-rss">Goldfish RSS</a></li>
-</ul>
-
 <div class="content">
+  <ul>
+    {{ range (.Paginate ( where .Site.RegularPages "Type" "in" site.Params.mainSections )).Pages -}}
+    <li>{{ .Date.Format "2006-01-02" }} - <a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+    {{ end -}}
+
+    <li><a href="projects/android-bus-tracker">Gainesville Bus Tracker</a></li>
+    <li><a href="projects/cpsc-493-senior-project">CPSC-493 Android Game</a></li>
+    <li><a href="projects/goldfish-rss">Goldfish RSS</a></li>
+  </ul>
+  {{ template "_internal/pagination.html" . -}}
+
   <h2>Links</h2>
   <ul>
     <li><a href="https://github.com/victorbush">github.com/victorbush</a></li>
