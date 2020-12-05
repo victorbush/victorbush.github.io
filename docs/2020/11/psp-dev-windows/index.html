@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PSP Development on Windows - victorbush</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Staatliches&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Antic+Slab&display=swap" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="/css/normalize.css">
+<link rel="stylesheet" type="text/css" href="/css/victorbush.css">
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGMKKNJ3RD"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-HGMKKNJ3RD');
+  </script>
+</head>
+<body>
+<header>
+  <div class="site-header">
+    <a href="http://victorbush.github.io/">
+      <img src="/img/victorbush-icon.png" alt="victorbush" />
+    </a>  
+  </div>
+
+  <nav></nav>
+</header>
+<main>
+  <article>
+    
+<div class="cover" style="background-image: url(psp.jpg)">
+</div>
+<div class="meta">
+  <div>November 27, 2020</div>
+  </div>
+<div class="title">
+  <h1>PSP Development on Windows</h1>
+  </div>
+<div class="content">
+  <p>Sony&rsquo;s <a href="https://en.wikipedia.org/wiki/PlayStation_Portable">PlayStation Portable</a> hit Japanese stores in late 2004. Within a year of release, the first code exploits paved the way for a vibrant custom-firmware and homebrew scene, forming a prosthetic that keeps the PSP kicking 15 years later. Running emulators, homebrew games, and game backups is where the PSP really shines.</p>
+<p>Running custom code on the PSP has always intrigued me. One byproduct of the PSP hacking community was an unofficial, yet substantial, <a href="https://github.com/pspdev/pspsdk">SDK</a>. It&rsquo;s an extensive code library and toolchain built in a Linux environment. For those of us who prefer a Windows development environment, this presents a slight annoyance. A Linux virtual machine has always been my go-to here, but this is not a workflow I particularly care for. <a href="https://docs.microsoft.com/en-us/windows/wsl/">WSL</a> is certainly an option now, but there&rsquo;s something I like better in this situation: Docker.</p>
+<p>There exists a <a href="https://github.com/pspdev/pspdev-docker">Docker image</a> containing the PSP toolchain in an isolated environment to compile PSP code within. No need to setup a second system, run a VM, or install the toolchain with WSL. Below I&rsquo;ve made some notes on using the <code>pspdev-docker</code> image along with an example repository.</p>
+<h2 id="quick-start">Quick Start</h2>
+<p>Clone the <a href="https://github.com/victorbush/examples.pspdev">sample repo</a>. The repository has the following directory structure:</p>
+<table>
+<thead>
+<tr>
+<th align="left">Directory</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>/ppsspp</code></td>
+<td align="left">The <a href="http://ppsspp.org/">PPSSPP</a> emulator. Makes it easy to test without constantly copying to hardware.</td>
+</tr>
+<tr>
+<td align="left"><code>/projects</code></td>
+<td align="left">A place to put your PSP projects.</td>
+</tr>
+<tr>
+<td align="left"><code>/pspdev-docker</code></td>
+<td align="left">Contains the <code>pspdev-docker</code> <a href="https://github.com/pspdev/pspdev-docker">repository</a> used to build the Docker image.</td>
+</tr>
+<tr>
+<td align="left"><code>/pspsdk</code></td>
+<td align="left">Contains the PSP SDK <a href="https://github.com/pspdev/pspsdk">repository</a>. Included for reference and to provide Intellisense support for Visual Studio. The SDK also has lots of great sample code.</td>
+</tr>
+<tr>
+<td align="left"><code>/references</code></td>
+<td align="left">A collection of PSP development resources.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="1-install-docker">1. Install Docker</h3>
+<p>Install <a href="https://www.docker.com/products/docker-desktop">Docker</a> on your Windows machine. Both the WSL and Hyper-V backends work.</p>
+<h3 id="2-build-the-docker-image">2. Build the Docker image</h3>
+<p>Navigate to the <code>/pspdev-docker</code> directory and execute the following command to build the Docker image:</p>
+<pre><code>docker build -t pspdev-docker .
+</code></pre><p>This will take some time. The Dockerfile is designed to get the necessary dependencies and execute the PSP toolchain script to setup everything. After the image is built, you won&rsquo;t have to deal with any of this again. And since this is Docker, there shouldn&rsquo;t be any problems with missing or incompatible dependencies; it should &ldquo;just work.&rdquo;</p>
+<p>After the image is built, you can optionally dump it to a file for transfer to another PC or backup drive:</p>
+<pre><code>docker save pspdev-docker -o pspdev.docker
+</code></pre><h3 id="3-download-ppsspp">3. Download PPSSPP</h3>
+<p>Download <a href="http://ppsspp.org/">PPSSPP</a> and extract it into the <code>/ppsspp</code> directory. As a result, the PPSSPP executable should be located at <code>/ppsspp/PPSSPPWindows.exe</code>.</p>
+<h3 id="4-run-the-sample-project">4. Run the sample project</h3>
+<p>You can open the sample solution in Visual Studio 2019: <code>/projects/sample/visual-studio/sample.sln</code>. The sample code itself is lifted from the PSP SDK with only minor modification.</p>
+<p>Build and run the sample program. PPSSPP should launch and run the sample automatically.</p>
+<h3 id="5-run-on-sample-on-hardware">5. Run on sample on hardware</h3>
+<p>You can run the sample on actual PSP hardware. You will need a PSP that can run homebrew (i.e., has custom firmware). Copy <code>/game/EBOOT.pbp</code> from your computer to the PSP memory stick: <code>/PSP/GAME/SampleCube/EBOOT.pbp</code>. You will now see a &ldquo;Cube Sample&rdquo; game on the PSP.</p>
+
+<div class="img-container">
+
+
+	
+	<a href="sample.png">
+	
+
+	<img src="sample.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+	<div class="img-caption">Sample app running in the emulator.</div>
+	
+</div>
+
+<h2 id="building">Building</h2>
+<p>Let&rsquo;s discuss how the sample project works, starting with how the code gets compiled. I&rsquo;ve created three simple batch files that compile the code using the <code>pspdev-docker</code> image.</p>
+<pre><code>psp-make.bat
+psp-clean.bat
+psp-rebuild.bat
+</code></pre><p>When <code>psp-make.bat</code> is executed, it creates a Docker container using the <code>pspdev-docker</code> image, executes the <code>make</code> command within the container, then removes the container when finished. The container uses the <code>makefile</code> in the same directory as the batch file.</p>
+<p>After compilation is finished, the batch file copies <code>EBOOT.PBP</code> to the <code>game</code> directory. Any game asset files that need accessed at runtime should be stored in this directory.</p>
+<p>Use <code>psp-clean.bat</code> to execute <code>make clean</code> in the container. Similarly use <code>psp-rebuild.bat</code> to execute <code>make rebuild</code>. I&rsquo;ve noticed a few instances when an incremental build resulted in some weird behavior even though the compile succeeded (i.e., unexpected crashes). A rebuild is often a good place to start debugging - if the issue persists after the rebuild, then proceed to investigate what is wrong with the code.</p>
+<h2 id="makefile">Makefile</h2>
+<p>Any source files, libraries, and compiler flags must be specified in the <code>makefile</code>. Adding the source files to the Visual Studio project is just for editing purposes; you&rsquo;ll have to manually update the makefile.</p>
+<p>The sample code in the PSP SDK is a good reference for different options and libraries that are available.</p>
+<h3 id="buildmak">Build.mak</h3>
+<p>There is a base makefile provided by the PSP SDK. It handles some heavy lifting for us. We define any required variables in our makefile (SDK paths, source files, complier flags, libraries), then include <code>build.mak</code> and let it take over from there.</p>
+<pre><code># Define variables here
+PSPSDK=$(shell psp-config --pspsdk-path)
+PSPDIR=$(shell psp-config --psp-prefix)
+TARGET = my_app
+OBJS = src/main.o
+
+# And so on...
+
+# Include base makefile
+include $(PSPSDK)/lib/build.mak
+</code></pre><p>There is a copy of the base makefile file in the sample repo at <code>/references/build.mak</code> for quick reference. You can always copy <code>build.mak</code> from the SDK into your project and make changes (if you need different behavior). You can also ignore it and roll your own makefile completely (if you&rsquo;re insane).</p>
+<p>The notes here assume you are using <code>build.mak</code> from the SDK.</p>
+<h3 id="source-files">Source files</h3>
+<p>Specify each source file to compile in the <code>OBJS</code> section of the makefile. Instead of the extension <code>.cpp</code> or <code>.c</code>, use <code>.o</code>. The compiler will look for the corresponding source file and generate the compiled object output with the <code>.o</code> extension.</p>
+<pre><code>OBJS = src/callbacks.o \
+       src/cube.o \
+       src/logo.o \
+       src/vram.o
+</code></pre><p>You can specify additional include paths using <code>INCDIR</code>. For example, this includes the <code>src</code> directory in the search path for header files:</p>
+<pre><code>INCDIR := $(INCDIR) . src
+</code></pre><h3 id="compiler-flags">Compiler flags</h3>
+<p>I am not well versed in <code>gcc</code>, so I can&rsquo;t expound much on compiler flags. You can <a href="https://www.bing.com/search?q=gcc+compiler+flags">Bing it</a> instead. I&rsquo;ll note two things I found handy.</p>
+<h4 id="c11-compiler-mode">C11 compiler mode</h4>
+<pre><code>-std=c11
+</code></pre><p>This tells the compiler to use the C11 standard.</p>
+<h4 id="preprocessor-definitions">Preprocessor definitions</h4>
+<pre><code>-DMY_COMPILER_FLAG
+</code></pre><p>This defines <code>MY_COMPILER_FLAG</code>. It is prefixed with <code>D</code> in the makefile; that is not a typo. These come in handy when you want different build paths for sections of code or configuration (for example, a PSP build and a Windows build). Some libraries may also have configuration options you wish to set with preprocessor definitions.</p>
+<h3 id="libraries">Libraries</h3>
+<p>Including static libraries in your build is done in the <code>LIBS</code> part of the <code>makefile</code>. I usually reference the PSP SDK samples to know which libraries to include for certain functionality in the SDK.</p>
+<p>If you have libraries outside the SDK you want to use, you can update the library search path. For example:</p>
+<pre><code>LIBDIR := $(LIBDIR) . src/thirdparty/lua/psp-5.3.4/lib
+LIBS = -llua &lt;other libs as needed&gt;
+</code></pre><h3 id="vfpu">VFPU</h3>
+<p>For 3D graphics you&rsquo;ll want to use the <code>vfpu</code> versions of the graphics libraries. This utilizes the PSP&rsquo;s vector co-processor. Any thread you want to use this on will need created with the <code>THREAD_ATTR_VFPU</code> attribute. This is accomplished using a macro from the PSP SDK:</p>
+<pre><code>// This goes in your code, not the makefile. See sample project for example.
+PSP_MAIN_THREAD_ATTR(THREAD_ATTR_USER|THREAD_ATTR_VFPU);
+</code></pre><p>See The Naked PSP presentation in the references folder for more details on the VFPU.</p>
+<h2 id="visual-studio">Visual Studio</h2>
+<p>The sample repository includes a Visual Studio solution as an example of using Visual Studio to develop your PSP game. Visual Studio is not required; you can use whatever IDE or text editor you prefer.</p>
+<p>Visual Studio support is not perfect - it will show errors in places there are none. But for the most part Intellisense picks up the PSP SDK functions and types just fine. Below are some notes on how the sample project is setup.</p>
+<h3 id="project-directory-structure">Project directory structure</h3>
+<p>The sample project is setup with the following directory structure:</p>
+<table>
+<thead>
+<tr>
+<th align="left">Directory</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>\build</code></td>
+<td align="left">Build output and intermediate files (for Visual Studio).</td>
+</tr>
+<tr>
+<td align="left"><code>\game</code></td>
+<td align="left">Game directory; contains assets and output binaries.</td>
+</tr>
+<tr>
+<td align="left"><code>\src</code></td>
+<td align="left">Source code.</td>
+</tr>
+<tr>
+<td align="left"><code>\visual-studio</code></td>
+<td align="left">Visual Studio solution and projects.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="general-configuration">General configuration</h3>
+<p>The project is an empty Visual Studio project with the Configuration Type set to <code>Makefile</code>.</p>
+<pre><code>Configuration Type:
+Makefile
+
+Output Directory:
+$(SolutionDir)..\build\$(MSBuildProjectName)\$(Platform)\$(Configuration)\
+
+Immediate Directory:
+$(SolutionDir)..\build\$(MSBuildProjectName)\$(Platform)\$(Configuration)\
+</code></pre><p>For the sample, the output directories are not critical since we only have a PSP project - the EBOOT.PBP is generated by the Docker container.</p>
+
+<div class="img-container">
+
+
+	
+	<a href="vs-project-general.png">
+	
+
+	<img src="vs-project-general.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+</div>
+
+<h3 id="build-configuration">Build configuration</h3>
+<p>The NMake property section tells Visual Studio what commands to use when building the project. We want to use batch files to invoke the <code>pspdev-docker</code> container. When building in Visual Studio, view the Output log to see the build status, including warnings and errors.</p>
+<pre><code>Build Command Line:
+$(SolutionDir)..\psp-make.bat
+
+Rebuild All Command Line:
+$(SolutionDir)..\psp-rebuild.bat
+
+Clean Command Line:
+$(SolutionDir)..\psp-clean.bat
+</code></pre><p>The preprocessor definitions and include search paths are used for Intellisense.</p>
+<pre><code>Preprocessor Definitions:
+&lt;Set as needed per build configuration/platform&gt;
+
+Include Search Path:
+$(SolutionDir)..\src;$(SolutionDIr)..\..\..\pspsdk\src\;$(SolutionDIr)..\..\..\pspsdk\src\atrac3;$(SolutionDIr)..\..\..\pspsdk\src\audio;$(SolutionDIr)..\..\..\pspsdk\src\base;$(SolutionDIr)..\..\..\pspsdk\src\ctrl;$(SolutionDIr)..\..\..\pspsdk\src\debug;$(SolutionDIr)..\..\..\pspsdk\src\display;$(SolutionDIr)..\..\..\pspsdk\src\fpu;$(SolutionDIr)..\..\..\pspsdk\src\ge;$(SolutionDIr)..\..\..\pspsdk\src\gu;$(SolutionDIr)..\..\..\pspsdk\src\gum;$(SolutionDIr)..\..\..\pspsdk\src\hprm;$(SolutionDIr)..\..\..\pspsdk\src\kernel;$(SolutionDIr)..\..\..\pspsdk\src\libc;$(SolutionDIr)..\..\..\pspsdk\src\mp3;$(SolutionDIr)..\..\..\pspsdk\src\mpeg;$(SolutionDIr)..\..\..\pspsdk\src\nand;$(SolutionDIr)..\..\..\pspsdk\src\net;$(SolutionDIr)..\..\..\pspsdk\src\openpsid;$(SolutionDIr)..\..\..\pspsdk\src\power;$(SolutionDIr)..\..\..\pspsdk\src\prof;$(SolutionDIr)..\..\..\pspsdk\src\registry;$(SolutionDIr)..\..\..\pspsdk\src\rtc;$(SolutionDIr)..\..\..\pspsdk\src\sdk;$(SolutionDIr)..\..\..\pspsdk\src\sircs;$(SolutionDIr)..\..\..\pspsdk\src\startup;$(SolutionDIr)..\..\..\pspsdk\src\umd;$(SolutionDIr)..\..\..\pspsdk\src\usb;$(SolutionDIr)..\..\..\pspsdk\src\usbstor;$(SolutionDIr)..\..\..\pspsdk\src\user;$(SolutionDIr)..\..\..\pspsdk\src\utility;$(SolutionDIr)..\..\..\pspsdk\src\vfpu;$(SolutionDIr)..\..\..\pspsdk\src\video;$(SolutionDIr)..\..\..\pspsdk\src\vsh;$(SolutionDIr)..\..\..\pspsdk\src\wlan;$(NMakeIncludeSearchPath)
+</code></pre>
+<div class="img-container">
+
+
+	
+	<a href="vs-project-general.png">
+	
+
+	<img src="vs-project-nmake.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+</div>
+
+<h3 id="debugging-configuration">Debugging configuration</h3>
+<p>If you use the project property dialog in Visual Studio to edit the debugging settings, it will store the values in the <code>*.vcxproj.user</code> file. Typically this file is not stored in version control, which means each user must set their own debugging options. For convenience, you can set default debugging options manually in the <code>*.vcxproj</code> file.</p>
+<p>The following property group sets default debugging settings. It must be placed somewhere after <code>&lt;Import Project=&quot;$(VCTargetsPath)\Microsoft.Cpp.props&quot; /&gt;</code> in the project file.</p>
+<pre><code>&lt;PropertyGroup&gt;
+  &lt;LocalDebuggerCommand&gt;$(SolutionDir)../../../ppsspp/PPSSPPWindows64.exe&lt;/LocalDebuggerCommand&gt;
+  &lt;LocalDebuggerCommandArguments&gt;$(SolutionDir)../game/EBOOT.PBP&lt;/LocalDebuggerCommandArguments&gt;
+  &lt;LocalDebuggerWorkingDirectory&gt;$(SolutionDir)../../../ppsspp/&lt;/LocalDebuggerWorkingDirectory&gt;
+  &lt;DebuggerFlavor&gt;WindowsLocalDebugger&lt;/DebuggerFlavor&gt;
+&lt;/PropertyGroup&gt;
+</code></pre><p>When you debug an instance of the project, the PPSSPP emulator is launched using the freshly built EBOOT.PBP.</p>
+
+<div class="img-container">
+
+
+	
+	<a href="vs-project-general.png">
+	
+
+	<img src="vs-project-debugging.png" 
+
+	
+	
+	/>
+
+	
+	</a>
+	
+	
+	
+</div>
+
+<h2 id="references">References</h2>
+<p>I&rsquo;ve included some development resources in the sample repository that I found useful. They are included for preservation purposes and credit goes to the original authors.</p>
+<ul>
+<li>The Naked PSP presentation notes by TyRaNiD is included in PDF form. It is an excellent deep dive on the PSP internals and software toolchain.</li>
+<li>The Ghoti.nl tutorials are great practical PSP programming tutorials. I&rsquo;ve resurrected as much as a could through archive.org.</li>
+</ul>
+<p>Here are some additional links:</p>
+<ul>
+<li><a href="https://github.com/pspdev/pspsdk">PSP SDK GitHub</a></li>
+<li><a href="https://github.com/pspdev/pspdev-docker">PSP Docker GitHub</a></li>
+<li><a href="https://en.wikibooks.org/wiki/PSP">PSP Wikibook</a></li>
+<li><a href="https://en.wikibooks.org/wiki/PSP_Programming">PSP Programming Wikibook</a></li>
+<li><a href="https://playstationdev.wiki/pspdevwiki">PSP Dev Wiki</a></li>
+<li><a href="https://en.wikipedia.org/wiki/PlayStation_Portable">PSP Wikipedia</a></li>
+</ul>
+<h2 id="conclusion">Conclusion</h2>
+<p>This article documents a PSP development workflow on Windows, but does not provide anything in terms of actually programming a game. The development references will definitely help in this regard. On that note, I have been working on a more substantial sample game, experimenting with things like game engine design and platform abstraction (having both a PSP and Windows build of the game for easier debugging and development). I plan to share this in the future.</p>
+<p>In the meantime, hopefully this write-up provides a jump-start for someone wanting to build some homebrew. It can be a challenging, yet rewarding learning experience. Have fun writing code for the PSP!</p>
+</div>
+
+  </article>
+</main>
+<footer>
+  <div>
+    <div></div>
+  </div>
+</footer>
+</body>
+</html>

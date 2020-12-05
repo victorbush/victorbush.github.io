@@ -2,6 +2,7 @@ body {
 	background-color: #fbfbfb;
 	font-family: 'Libre Baskerville', serif;
 	font-size: 90%;
+	word-break: break-word;
 }
 
 p {
@@ -33,6 +34,11 @@ h1, h2 {
 h2 {
 	margin: 3rem -1rem 2rem -1rem;
 }
+@media (max-width: 550px) {
+	h2 {
+		margin: 3rem 0rem 2rem 0rem;
+	}
+}
 
 h3, h4, h5 {
 	color: #3d3d3d;
@@ -41,6 +47,11 @@ h3, h4, h5 {
 
 ul, ol {
 	line-height: 1.5rem;
+}
+@media (max-width: 600px) {
+	ul, ol {
+		padding-left: 1rem;
+	}
 }
 
 img {
@@ -53,6 +64,7 @@ Tables
 
 table {
 	border: 0.1rem dashed #3d3d3d;
+	word-break: normal;
 }
 
 tbody tr:first-child td {
@@ -84,6 +96,68 @@ Header
 
 nav {
 	text-align: center;
+}
+
+/*
+Home
+*/
+
+.home-articles {
+	border: none;
+	padding: 0;
+	line-height: 1rem;
+}
+
+.home-articles li {
+	list-style: none;
+	display: flex;
+	flex-direction: row;
+}
+@media (max-width: 550px) {
+	.home-articles li {
+		flex-direction: column;
+	}
+}
+
+.home-article {
+	text-decoration: none;
+	display: block;
+	margin: 0.5rem 0;
+}
+@media (max-width: 550px) {
+	.home-article {
+		margin: 1.0rem 0;
+	}
+}
+.home-article-title {
+	text-decoration: underline;
+}
+
+.home-article-date {
+	display: block;
+	font-family: monospace;
+	font-size: 0.9rem;
+	display: inline-block;
+	margin-right: 1rem;
+	flex: 0 0 4.5rem;
+	width: 4.5rem;
+}
+@media (max-width: 550px) {
+	.home-article-date {
+		flex: 0 0 0;
+		display: inline-block;
+		margin-bottom: 0.3rem;
+	}
+}
+
+.home-article-date-cell {
+	width: 5rem;
+}
+@media (max-width: 550px) {
+	.home-article-date-cell {
+		display: none;
+		width: auto;
+	}
 }
 
 /*
@@ -128,6 +202,16 @@ article {
 
 .content {
 	padding: 0 1rem 2rem 1rem;
+}
+@media (max-width: 550px) {
+	.content {
+		padding: 0;
+	}
+}
+
+.home-date {
+	font-size: 0.9rem;
+	font-family: monospace;
 }
 
 /*

@@ -3,17 +3,22 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>http://victorbush.github.io/2018/04/lets-encrypt-nginx-dns-docker/</loc>
-    <lastmod>2018-04-21T11:21:23-05:00</lastmod>
+    <loc>http://victorbush.github.io/posts/</loc>
+    <lastmod>2020-11-27T10:21:23-05:00</lastmod>
   </url>
   
   <url>
-    <loc>http://victorbush.github.io/posts/</loc>
-    <lastmod>2018-04-21T11:21:23-05:00</lastmod>
+    <loc>http://victorbush.github.io/2020/11/psp-dev-windows/</loc>
+    <lastmod>2020-11-27T10:21:23-05:00</lastmod>
   </url>
   
   <url>
     <loc>http://victorbush.github.io/</loc>
+    <lastmod>2020-11-27T10:21:23-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://victorbush.github.io/2018/04/lets-encrypt-nginx-dns-docker/</loc>
     <lastmod>2018-04-21T11:21:23-05:00</lastmod>
   </url>
   
