@@ -7,15 +7,36 @@
 </div>
 
 <div class="content">
-  <ul>
+  <ul class="home-articles">
     {{ range (.Paginate ( where .Site.RegularPages "Type" "in" site.Params.mainSections )).Pages -}}
-    <li>{{ .Date.Format "2006-01-02" }} - <a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+      <li class="home-article">
+        <div>
+          <div class="home-article-date">{{ .Date.Format "2006-01-02" }}</div>
+        </div>
+        <a class="home-article-title" href="{{ .RelPermalink }}">{{ .Title }}</a>
+      </li>
     {{ end -}}
 
-    <li><a href="projects/android-bus-tracker">Gainesville Bus Tracker</a></li>
-    <li><a href="projects/cpsc-493-senior-project">CPSC-493 Android Game</a></li>
-    <li><a href="projects/goldfish-rss">Goldfish RSS</a></li>
+    <li class="home-article">
+      <div>
+        <div class="home-article-date">Archive</div>
+      </div>
+      <a class="home-article-title" href="projects/android-bus-tracker">Gainesville Bus Tracker</a>
+    </li>
+    <li class="home-article">
+      <div>
+        <div class="home-article-date">Archive</div>
+      </div>
+      <a class="home-article-title" href="projects/cpsc-493-senior-project">CPSC-493 Android Game</a>
+    </li>
+    <li class="home-article">
+      <div>
+        <div class="home-article-date">Archive</div>
+      </div>
+      <a class="home-article-title" href="projects/goldfish-rss">Goldfish RSS</a>
+    </li>
   </ul>
+
   {{ template "_internal/pagination.html" . -}}
 
   <h2>Links</h2>
