@@ -65,6 +65,8 @@ Tables
 table {
 	border: 0.1rem dashed #3d3d3d;
 	word-break: normal;
+	display: block;
+	overflow-x: auto;
 }
 
 tbody tr:first-child td {
@@ -77,6 +79,11 @@ th {
 
 td, th {
 	padding: 0.4rem 0.9rem;
+}
+@media (max-width: 550px) {
+	td, th {
+		padding: 0.4rem 0.4rem;
+	}
 }
 
 /*
@@ -160,6 +167,21 @@ Home
 	}
 }
 
+.home-links {
+	padding: 0;
+	line-height: 1.5rem;
+}
+.home-links li {
+	list-style: none;
+}
+.home-link-img img {
+	width: 1rem;
+	display: inline-block;
+	margin-right: 0.5rem;
+	top: 0.1rem;
+	position: relative;
+}
+
 /*
 Content
 */
@@ -202,6 +224,7 @@ article {
 
 .content {
 	padding: 0 1rem 2rem 1rem;
+	margin-bottom: 2rem;
 }
 @media (max-width: 550px) {
 	.content {
@@ -236,6 +259,11 @@ pre code {
 	margin-bottom: 2rem;
 	overflow-x: auto;
 	color: #000;
+}
+@media (max-width: 550px) {
+	code, pre code {
+		font-size: 0.9rem;
+	}
 }
 
 /*
