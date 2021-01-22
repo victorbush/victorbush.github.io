@@ -4,7 +4,7 @@ draft: false
 cover: "feature.png"
 ---
 
-Goldfish RSS was a podcast management system designed for a church in my hometown. The first few iterations of the program were Windows applications (see the old [SourceForge project](http://goldfishrss.sourceforge.net) that would manage the XML feeds locally and upload the changes to the Web, along with any media files.
+Goldfish RSS was a podcast management system designed for a church in my hometown. The first few iterations of the program were Windows applications (see the old [SourceForge project](http://goldfishrss.sourceforge.net)) that would manage the XML feeds locally and upload the changes to the Web, along with any media files.
 
 The application was later rewritten into a PHP/MySQL Web app, allowing management from anywhere. It allowed for easy integration into the church's Web site and could generate RSS feed XML on the fly for consumption by iTunes and other RSS consumers.
 
