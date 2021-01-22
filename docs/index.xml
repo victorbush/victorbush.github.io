@@ -112,7 +112,7 @@ The Game The basic premise of the game is that you can control the direction of 
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>http://victorbush.github.io/projects/goldfish-rss/</guid>
-      <description>Goldfish RSS was a podcast management system designed for a church in my hometown. The first few iterations of the program were Windows applications (see the old SourceForge project that would manage the XML feeds locally and upload the changes to the Web, along with any media files.
+      <description>Goldfish RSS was a podcast management system designed for a church in my hometown. The first few iterations of the program were Windows applications (see the old SourceForge project) that would manage the XML feeds locally and upload the changes to the Web, along with any media files.
 The application was later rewritten into a PHP/MySQL Web app, allowing management from anywhere. It allowed for easy integration into the church&amp;rsquo;s Web site and could generate RSS feed XML on the fly for consumption by iTunes and other RSS consumers.</description>
     </item>
     
