@@ -146,8 +146,8 @@ Home
 	font-size: 0.9rem;
 	display: inline-block;
 	margin-right: 1rem;
-	flex: 0 0 4.5rem;
-	width: 4.5rem;
+	flex: 0 0 5.5rem;
+	width: 5.5rem;
 }
 @media (max-width: 550px) {
 	.home-article-date {
